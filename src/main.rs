@@ -1,5 +1,13 @@
 use bevy::prelude::*;
 
+pub mod character_controls;
+
 fn main() {
-    App::new().run();
+    let mut app = App::new();
+
+    app.add_plugins(DefaultPlugins);
+
+    character_controls::register(&mut app);
+
+    app.run();
 }
