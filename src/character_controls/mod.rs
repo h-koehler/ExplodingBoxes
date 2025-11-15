@@ -5,8 +5,8 @@ pub mod swat;
 
 const MOVE_SPEED: f32 = 200.0;
 const VELOCITY_CHANGE: f32 = 1.0;
-const PLAYER_ASS_PATH: &str = "smile.png";
-const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(32.0, 32.0));
+const PLAYER_ASS_PATH: &str = "player.png";
+const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(64.0, 64.0));
 const ROOM_INSET: f32 = 4.0;
 
 #[derive(Component)]
@@ -86,6 +86,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             custom_size: Some(Vec2::splat(45.0)),
             ..Default::default()
         },
+        Transform::from_translation(Vec3::Z * 3.0),
     ));
 }
 

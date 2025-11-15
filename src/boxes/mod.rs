@@ -4,6 +4,8 @@ use bevy::{prelude::*, time::common_conditions::on_timer};
 
 use crate::room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, GOAL_SIZE, Movable};
 
+pub mod explode;
+
 #[derive(Component)]
 pub struct GameBox;
 
@@ -50,6 +52,8 @@ fn kill_box(
 }
 
 pub(super) fn register(app: &mut App) {
+    explode::register(app);
+
     app.add_systems(
         Update,
         (
