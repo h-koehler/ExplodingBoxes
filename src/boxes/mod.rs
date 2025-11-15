@@ -4,8 +4,10 @@ use bevy::{prelude::*, time::common_conditions::on_timer};
 
 use crate::room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable};
 
+pub mod explode;
+
 #[derive(Component)]
-pub struct Box;
+pub struct GameBox;
 
 const SECONDS_BETWEEN_BOX_SPAWNS: f32 = 1.0;
 const BOX_SIZE: f32 = (CONVEYOR_SIZE - 10) as f32;
@@ -17,7 +19,7 @@ fn spawn_box(
 ) {
     for box_spawner_transform in q_box_spawner_transform.iter() {
         commands.spawn((
-            Box,
+            GameBox,
             Movable,
             Sprite {
                 image: asset_server.load("green_box.png"),
@@ -31,7 +33,7 @@ fn spawn_box(
 
 fn kill_box(
     mut commands: Commands,
-    q_box: Query<(Entity, &Transform), With<Box>>,
+    q_box: Query<(Entity, &Transform), With<GameBox>>,
     q_box_goal_transform: Query<&Transform, With<BoxGoal>>,
 ) {
     for goal_transform in q_box_goal_transform.iter() {
@@ -50,6 +52,8 @@ fn kill_box(
 }
 
 pub(super) fn register(app: &mut App) {
+    explode::register(app);
+
     app.add_systems(
         Update,
         (

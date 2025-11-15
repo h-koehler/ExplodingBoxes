@@ -1,10 +1,12 @@
 use crate::room::{Movable, ROOM_HEIGHT, ROOM_WIDTH};
 use bevy::prelude::*;
 
+pub mod swat;
+
 const MOVE_SPEED: f32 = 200.0;
 const VELOCITY_CHANGE: f32 = 1.0;
-const PLAYER_ASS_PATH: &str = "smile.png";
-const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(32.0, 32.0));
+const PLAYER_ASS_PATH: &str = "player.png";
+const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(64.0, 64.0));
 const ROOM_INSET: f32 = 4.0;
 
 #[derive(Component)]
@@ -42,30 +44,34 @@ fn player_input(
 
 fn apply_velocity(
     time: Res<Time>,
-    mut q_player: Query<(&mut Transform, &Velocity), With<Character>>,
+    mut q_player: Query<(&mut Transform, &Velocity, Has<Character>)>,
 ) {
     let dt = time.delta_secs();
-    let (mut trans, vel) = q_player.single_mut().expect("No Player Object");
+    for (mut trans, vel, is_player) in q_player.iter_mut() {
+        trans.translation.x += vel.linear_velocity.x * dt;
+        trans.translation.y += vel.linear_velocity.y * dt;
 
-    trans.translation.x += vel.linear_velocity.x * dt;
-    trans.translation.y += vel.linear_velocity.y * dt;
+        if !is_player {
+            continue;
+        }
 
-    let half_width = ROOM_WIDTH as f32 / 2.0;
-    let half_height = ROOM_HEIGHT as f32 / 2.0;
+        let half_width = ROOM_WIDTH as f32 / 2.0;
+        let half_height = ROOM_HEIGHT as f32 / 2.0;
 
-    let (half_player_width, half_player_height) = if let Some(size) = PLAYER_SIZE {
-        (size.x * 0.5, size.y * 0.5)
-    } else {
-        (50.0, 50.0)
-    };
+        let (half_player_width, half_player_height) = if let Some(size) = PLAYER_SIZE {
+            (size.x * 0.5, size.y * 0.5)
+        } else {
+            (50.0, 50.0)
+        };
 
-    let min_x = -half_width + half_player_width + ROOM_INSET;
-    let max_x = half_width - half_player_width - ROOM_INSET;
-    let min_y = -half_height + half_player_height + ROOM_INSET;
-    let max_y = half_height - half_player_height - ROOM_INSET;
+        let min_x = -half_width + half_player_width + ROOM_INSET;
+        let max_x = half_width - half_player_width - ROOM_INSET;
+        let min_y = -half_height + half_player_height + ROOM_INSET;
+        let max_y = half_height - half_player_height - ROOM_INSET;
 
-    trans.translation.x = trans.translation.x.clamp(min_x, max_x);
-    trans.translation.y = trans.translation.y.clamp(min_y, max_y);
+        trans.translation.x = trans.translation.x.clamp(min_x, max_x);
+        trans.translation.y = trans.translation.y.clamp(min_y, max_y);
+    }
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -80,10 +86,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             custom_size: Some(Vec2::splat(45.0)),
             ..Default::default()
         },
+        Transform::from_translation(Vec3::Z * 3.0),
     ));
 }
 
 pub(super) fn register(app: &mut App) {
+    swat::register(app);
+
     app.add_systems(Startup, setup);
-    app.add_systems(Update, (player_input, apply_velocity));
+    app.add_systems(Update, player_input);
+    app.add_systems(PostUpdate, apply_velocity);
 }

@@ -36,6 +36,16 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut conveyor_commands = create_conveyor(&mut commands, &asset_server, 1, 3, Vec2::X);
     conveyor_commands.insert(BoxSpawner);
 
+    commands.spawn((
+        Name::new("Background"),
+        Sprite {
+            custom_size: Some(Vec2::new(ROOM_WIDTH as f32, ROOM_HEIGHT as f32)),
+            image: asset_server.load("background.png"),
+            ..Default::default()
+        },
+        Transform::from_translation(Vec3::NEG_Z * 10.0),
+    ));
+
     create_line(
         &mut commands,
         &asset_server,
@@ -110,14 +120,14 @@ fn create_conveyor<'a>(
 ) -> EntityCommands<'a> {
     commands.spawn((
         Sprite {
-            image: asset_server.load("smile.png"),
+            image: asset_server.load("conveyer_piece.png"),
             custom_size: Some(Vec2::new(CONVEYOR_SIZE as f32, CONVEYOR_SIZE as f32)),
             ..Default::default()
         },
         Transform::from_translation(Vec3::new(
             X_OFFSET + (x * CONVEYOR_SIZE) as f32,
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            1.0,
+            0.0,
         )),
         Conveyor { direction },
     ))
