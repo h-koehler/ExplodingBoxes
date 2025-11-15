@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 
 use crate::boxes::spawn::{SpawnItem, SpawnList};
 
@@ -15,21 +15,17 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
     match *level {
         Level::One => commands.insert_resource(SpawnList {
             entries: vec![
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Bad(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Bad(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Bad(vec!["simple"]),
-                SpawnItem::Bad(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
-                SpawnItem::Bad(vec!["simple"]),
-                SpawnItem::Good(vec!["simple"]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
             ],
         }),
         _ => todo!(),

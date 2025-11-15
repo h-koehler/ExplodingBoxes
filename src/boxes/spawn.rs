@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 pub enum SpawnItem {
-    Bad(Vec<&'static str>),
-    Good(Vec<&'static str>),
+    Bad(Vec<(&'static str, Srgba)>),
+    Good(Vec<(&'static str, Srgba)>),
 }
 
 #[derive(Resource, Default)]
