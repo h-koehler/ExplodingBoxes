@@ -1,8 +1,7 @@
 use std::time::Duration;
 
-use bevy::{color::palettes::css, prelude::*, time::common_conditions::on_timer};
+use bevy::{prelude::*, time::common_conditions::on_timer};
 use rand::seq::IndexedRandom;
-use walkdir::WalkDir;
 
 use crate::{
     boxes::spawn::{SpawnItem, SpawnList},
@@ -22,7 +21,7 @@ pub struct BadBox;
 pub struct GoodBox;
 
 const SECONDS_BETWEEN_BOX_SPAWNS: f32 = 1.0;
-const BOX_SIZE: f32 = (CONVEYOR_SIZE - 10) as f32;
+const BOX_SIZE: f32 = (CONVEYOR_SIZE - 10) as f32 + 30.0;
 
 fn spawn_box(
     mut commands: Commands,
@@ -41,10 +40,6 @@ fn spawn_box(
 
             match entry {
                 SpawnItem::Good(files) => {
-                    let good_files = WalkDir::new("./assets/good");
-                    let neutral_files = WalkDir::new("./assets/neutral");
-
-                    // let (bevy_path, color) = get_bevy_path(good_files, neutral_files);
                     let path = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
@@ -52,17 +47,11 @@ fn spawn_box(
                         Sprite {
                             image: asset_server.load(format!("good/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
-                            // color: color.into(),
                             ..Default::default()
                         },
                     ));
                 }
                 SpawnItem::Bad(files) => {
-                    let bad_files = WalkDir::new("./assets/bad");
-                    let neutral_files = WalkDir::new("./assets/neutral");
-
-                    // let (bevy_path, color) = get_bevy_path(bad_files, neutral_files);
-
                     let path = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
@@ -70,7 +59,6 @@ fn spawn_box(
                         Sprite {
                             image: asset_server.load(format!("bad/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
-                            // color: color.into(),
                             ..Default::default()
                         },
                     ));
@@ -78,24 +66,6 @@ fn spawn_box(
             }
         }
     }
-}
-
-fn get_bevy_path(good_files: WalkDir, neutral_files: WalkDir) -> (String, Srgba) {
-    let possibilities = good_files
-        .into_iter()
-        .flatten()
-        .map(|x| (x, css::WHITE))
-        .chain(neutral_files.into_iter().flatten().map(|x| (x, css::GREEN)))
-        .collect::<Vec<_>>();
-
-    let (entry, color) = possibilities
-        .choose(&mut rand::rng())
-        .expect("no options!!!");
-
-    let mut path_split = entry.path().to_str().unwrap().split("assets/");
-    let _ = path_split.next();
-    let bevy_path = path_split.next().expect("bad").to_owned();
-    (bevy_path, *color)
 }
 
 #[derive(Message)]
