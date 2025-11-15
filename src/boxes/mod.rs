@@ -1,8 +1,11 @@
 use std::time::Duration;
 
 use bevy::{color::palettes::css, prelude::*, time::common_conditions::on_timer};
+use rand::seq::IndexedRandom;
+use walkdir::WalkDir;
 
 use crate::{
+    boxes::spawn::{SpawnItem, SpawnList},
     character_controls::{Velocity, swat::Swatted},
     room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable},
 };
@@ -25,22 +28,71 @@ fn spawn_box(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     q_box_spawner_transform: Query<&Transform, With<BoxSpawner>>,
+    mut boxes_to_spawn: ResMut<SpawnList>,
 ) {
     for box_spawner_transform in q_box_spawner_transform.iter() {
-        commands.spawn((
-            GameBox,
-            GoodBox,
-            Movable,
-            Velocity::default(),
-            Sprite {
-                image: asset_server.load("triangle_box.png"),
-                custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
-                color: css::RED.into(),
-                ..Default::default()
-            },
-            box_spawner_transform.clone(),
-        ));
+        if let Some(entry) = boxes_to_spawn.entries.pop() {
+            let mut ecmds = commands.spawn((
+                GameBox,
+                Movable,
+                Velocity::default(),
+                box_spawner_transform.clone(),
+            ));
+
+            match entry {
+                SpawnItem::Good(_) => {
+                    let good_files = WalkDir::new("./assets/good");
+                    let neutral_files = WalkDir::new("./assets/neutral");
+
+                    let (bevy_path, color) = get_bevy_path(good_files, neutral_files);
+
+                    ecmds.insert((
+                        GoodBox,
+                        Sprite {
+                            image: asset_server.load(bevy_path),
+                            custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
+                            color: color.into(),
+                            ..Default::default()
+                        },
+                    ));
+                }
+                SpawnItem::Bad(_) => {
+                    let bad_files = WalkDir::new("./assets/bad");
+                    let neutral_files = WalkDir::new("./assets/neutral");
+
+                    let (bevy_path, color) = get_bevy_path(bad_files, neutral_files);
+
+                    ecmds.insert((
+                        BadBox,
+                        Sprite {
+                            image: asset_server.load(bevy_path),
+                            custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
+                            color: color.into(),
+                            ..Default::default()
+                        },
+                    ));
+                }
+            }
+        }
     }
+}
+
+fn get_bevy_path(good_files: WalkDir, neutral_files: WalkDir) -> (String, Srgba) {
+    let possibilities = good_files
+        .into_iter()
+        .flatten()
+        .map(|x| (x, css::WHITE))
+        .chain(neutral_files.into_iter().flatten().map(|x| (x, css::GREEN)))
+        .collect::<Vec<_>>();
+
+    let (entry, color) = possibilities
+        .choose(&mut rand::rng())
+        .expect("no options!!!");
+
+    let mut path_split = entry.path().to_str().unwrap().split("assets/");
+    let _ = path_split.next();
+    let bevy_path = path_split.next().expect("bad").to_owned();
+    (bevy_path, *color)
 }
 
 #[derive(Message)]
@@ -77,6 +129,7 @@ fn kill_box(
 
 pub(super) fn register(app: &mut App) {
     explode::register(app);
+    spawn::register(app);
 
     app.add_systems(
         Update,
@@ -86,5 +139,6 @@ pub(super) fn register(app: &mut App) {
             ))),
             kill_box,
         ),
-    );
+    )
+    .add_message::<BoxMadeIt>();
 }

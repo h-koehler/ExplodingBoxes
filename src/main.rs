@@ -4,6 +4,7 @@ use crate::room::{ROOM_HEIGHT, ROOM_WIDTH};
 
 pub mod boxes;
 pub mod character_controls;
+pub mod levels;
 pub mod room;
 pub mod ui;
 
@@ -24,6 +25,7 @@ fn main() {
     boxes::register(&mut app);
     room::register(&mut app);
     ui::register(&mut app);
+    levels::register(&mut app);
 
     app.run();
 }
