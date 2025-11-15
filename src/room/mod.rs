@@ -1,3 +1,5 @@
+use std::arch::x86_64::_MM_CMPINT_FALSE;
+
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, WindowResolution},
@@ -9,6 +11,7 @@ pub struct Movable;
 #[derive(Component)]
 pub struct Conveyor {
     pub direction: Vec2,
+    pub corner_direction: Option<Vec2>,
 }
 
 #[derive(Component)]
@@ -33,7 +36,7 @@ fn setup_window_resolution(mut q_window: Query<&mut Window, With<PrimaryWindow>>
 
 fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
     // First conveyor is the box spawner.
-    let mut conveyor_commands = create_conveyor(&mut commands, &asset_server, 1, 3, Vec2::X);
+    let mut conveyor_commands = create_conveyor(&mut commands, &asset_server, 1, 3, Vec2::X, None);
     conveyor_commands.insert(BoxSpawner);
 
     commands.spawn((
@@ -53,7 +56,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         1,
         3,
         Vec2::X,
-        1,
+        true,
         Vec2::X,
         Vec2::NEG_Y,
     );
@@ -64,6 +67,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         ROOM_WIDTH / CONVEYOR_SIZE - 2,
         4,
         Vec2::NEG_Y,
+        None,
     );
     create_conveyor(
         &mut commands,
@@ -71,6 +75,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         ROOM_WIDTH / CONVEYOR_SIZE - 2,
         5,
         Vec2::NEG_Y,
+        None,
     );
 
     create_line(
@@ -80,13 +85,13 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         1,
         6,
         Vec2::NEG_X,
-        1,
+        false,
         Vec2::NEG_Y,
-        Vec2::NEG_X,
+        Vec2::NEG_Y,
     );
 
-    create_conveyor(&mut commands, &asset_server, 1, 7, Vec2::NEG_Y);
-    create_conveyor(&mut commands, &asset_server, 1, 8, Vec2::NEG_Y);
+    create_conveyor(&mut commands, &asset_server, 1, 7, Vec2::NEG_Y, None);
+    create_conveyor(&mut commands, &asset_server, 1, 8, Vec2::NEG_Y, None);
 
     create_line(
         &mut commands,
@@ -95,8 +100,8 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         2,
         9,
         Vec2::X,
-        1,
-        Vec2::X,
+        true,
+        Vec2::NEG_Y,
         Vec2::X,
     );
 
@@ -107,6 +112,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         ROOM_WIDTH / CONVEYOR_SIZE - 2,
         9,
         Vec2::X,
+        None,
     );
     conveyor_commands.insert(BoxGoal);
 }
@@ -117,6 +123,7 @@ fn create_conveyor<'a>(
     x: u32,
     y: u32,
     direction: Vec2,
+    corner_direction: Option<Vec2>,
 ) -> EntityCommands<'a> {
     commands.spawn((
         Sprite {
@@ -129,7 +136,10 @@ fn create_conveyor<'a>(
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
             0.0,
         )),
-        Conveyor { direction },
+        Conveyor {
+            direction,
+            corner_direction,
+        },
     ))
 }
 
@@ -140,21 +150,30 @@ fn create_line(
     end_x_offset: u32,
     y: u32,
     direction: Vec2,
-    x_dir: i32,
+    positive_x_dir: bool,
     first_dir: Vec2,
     last_dir: Vec2,
 ) {
     let n = ROOM_WIDTH / CONVEYOR_SIZE - end_x_offset;
     for x in start_x_offset..n {
-        let dir = if x == start_x_offset {
-            first_dir
-        } else if x == n - 1 {
-            last_dir
+        // Blame corns for this.
+        let (dir, after_turn_dir) = if x == start_x_offset && first_dir != direction {
+            if positive_x_dir {
+                (first_dir, Some(direction))
+            } else {
+                (direction, Some(first_dir))
+            }
+        } else if x == n - 1 && last_dir != direction {
+            if positive_x_dir {
+                (direction, Some(last_dir))
+            } else {
+                (last_dir, Some(direction))
+            }
         } else {
-            direction
+            (direction, None)
         };
 
-        create_conveyor(commands, asset_server, (x_dir * x as i32) as u32, y, dir);
+        create_conveyor(commands, asset_server, x, y, dir, after_turn_dir);
     }
 }
 
@@ -199,9 +218,28 @@ fn move_thing_on_conveyor(
         };
 
         if rects_overlap(&this_rect, &rect) {
-            trans.translation += Vec3::new(conv.direction.x, conv.direction.y, 0.0)
-                * time.delta_secs()
-                * CONVEYOR_SPEED;
+            let direction = if let Some(corner_direction) = conv.corner_direction {
+                // Corner conveyor. Not for the faint of heart.
+                let positive_direction = conv.direction == Vec2::X || conv.direction == Vec2::Y;
+                let positive_corner_direction =
+                    corner_direction == Vec2::X || corner_direction == Vec2::Y;
+                let positive_diagonal = positive_direction && !positive_corner_direction
+                    || !positive_direction && positive_corner_direction;
+                let x = trans.translation.x - rect.min.x;
+                let y = trans.translation.y - rect.min.y;
+                if positive_diagonal && x < y
+                    || !positive_diagonal && x + y > (CONVEYOR_SIZE as f32)
+                {
+                    conv.direction
+                } else {
+                    corner_direction
+                }
+            } else {
+                // Straight conveyor.
+                conv.direction
+            };
+            trans.translation +=
+                Vec3::new(direction.x, direction.y, 0.0) * time.delta_secs() * CONVEYOR_SPEED;
         }
     }
 }
