@@ -53,7 +53,7 @@ fn kill_box(
     mut commands: Commands,
     q_box: Query<(Entity, &Transform, Has<GoodBox>), (With<GameBox>, Without<Swatted>)>,
     q_box_goal_transform: Query<&Transform, With<BoxGoal>>,
-    mut evw_box_made_it: EventWriter<BoxMadeIt>,
+    mut evw_box_made_it: MessageWriter<BoxMadeIt>,
 ) {
     for goal_transform in q_box_goal_transform.iter() {
         let goal_min_x = goal_transform.translation.x - (CONVEYOR_SIZE as f32 / 2.0);
