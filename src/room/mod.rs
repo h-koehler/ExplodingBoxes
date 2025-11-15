@@ -27,6 +27,15 @@ fn setup_window_resolution(mut q_window: Query<&mut Window, With<PrimaryWindow>>
 }
 
 fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        Name::new("Background"),
+        Sprite {
+            custom_size: Some(Vec2::new(ROOM_WIDTH as f32, ROOM_HEIGHT as f32)),
+            image: asset_server.load("background.png"),
+            ..Default::default()
+        },
+    ));
+
     create_line(
         &mut commands,
         &asset_server,

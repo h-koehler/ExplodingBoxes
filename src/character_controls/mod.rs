@@ -1,6 +1,8 @@
 use crate::room::{Movable, ROOM_HEIGHT, ROOM_WIDTH};
 use bevy::prelude::*;
 
+pub mod swat;
+
 const MOVE_SPEED: f32 = 200.0;
 const VELOCITY_CHANGE: f32 = 1.0;
 const PLAYER_ASS_PATH: &str = "smile.png";

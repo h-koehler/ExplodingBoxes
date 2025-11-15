@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResolution};
+
+use crate::room::{ROOM_HEIGHT, ROOM_WIDTH};
 
 pub mod character_controls;
 pub mod room;
@@ -6,7 +8,15 @@ pub mod room;
 fn main() {
     let mut app = App::new();
 
-    app.add_plugins(DefaultPlugins);
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            resolution:
+                WindowResolution::new(ROOM_WIDTH, ROOM_HEIGHT).with_scale_factor_override(1.0),
+            resizable: false,
+            ..default()
+        }),
+        ..Default::default()
+    }));
 
     character_controls::register(&mut app);
     room::register(&mut app);
