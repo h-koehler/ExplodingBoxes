@@ -1,12 +1,11 @@
+use crate::room::{Movable, ROOM_HEIGHT, ROOM_WIDTH};
 use bevy::prelude::*;
-use crate::room::{ROOM_HEIGHT,ROOM_WIDTH};
 
 const MOVE_SPEED: f32 = 200.0;
 const VELOCITY_CHANGE: f32 = 1.0;
 const PLAYER_ASS_PATH: &str = "smile.png";
 const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(32.0, 32.0));
 const ROOM_INSET: f32 = 4.0;
-
 
 #[derive(Component)]
 pub struct Character;
@@ -36,11 +35,13 @@ fn player_input(
         dir.x += VELOCITY_CHANGE;
     }
 
-    char_vel.linear_velocity = char_vel.linear_velocity.lerp(dir.normalize_or_zero() * MOVE_SPEED, 0.1);
+    char_vel.linear_velocity = char_vel
+        .linear_velocity
+        .lerp(dir.normalize_or_zero() * MOVE_SPEED, 0.5);
 }
 
-fn apply_velocity (
-    time: Res<Time>, 
+fn apply_velocity(
+    time: Res<Time>,
     mut q_player: Query<(&mut Transform, &Velocity), With<Character>>,
 ) {
     let dt = time.delta_secs();
@@ -54,7 +55,7 @@ fn apply_velocity (
 
     let (half_player_width, half_player_height) = if let Some(size) = PLAYER_SIZE {
         (size.x * 0.5, size.y * 0.5)
-    }else {
+    } else {
         (50.0, 50.0)
     };
 
@@ -72,8 +73,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn((
         Character,
+        Movable,
         Velocity::default(),
-        Sprite::from_image(asset_server.load(PLAYER_ASS_PATH)),
+        Sprite {
+            image: asset_server.load(PLAYER_ASS_PATH),
+            custom_size: Some(Vec2::splat(45.0)),
+            ..Default::default()
+        },
     ));
 }
 
