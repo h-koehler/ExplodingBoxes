@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::room::{ROOM_HEIGHT,ROOM_WIDTH};
 
 const MOVE_SPEED: f32 = 200.0;
-const VELOCITY_INCREASE: f32 = 1.0;
+const VELOCITY_CHANGE: f32 = 1.0;
 const PLAYER_ASS_PATH: &str = "smile.png";
 const PLAYER_SIZE: Option<Vec2> = Some(Vec2::new(32.0, 32.0));
 const ROOM_INSET: f32 = 4.0;
@@ -24,16 +24,16 @@ fn player_input(
     let mut dir = Vec2::ZERO;
 
     if inputs.pressed(KeyCode::KeyW) {
-        dir.y += VELOCITY_INCREASE;
+        dir.y += VELOCITY_CHANGE;
     }
     if inputs.pressed(KeyCode::KeyS) {
-        dir.y -= VELOCITY_INCREASE;
+        dir.y -= VELOCITY_CHANGE;
     }
     if inputs.pressed(KeyCode::KeyA) {
-        dir.x -= VELOCITY_INCREASE;
+        dir.x -= VELOCITY_CHANGE;
     }
     if inputs.pressed(KeyCode::KeyD) {
-        dir.x += VELOCITY_INCREASE;
+        dir.x += VELOCITY_CHANGE;
     }
 
     char_vel.linear_velocity = dir.normalize_or_zero() * MOVE_SPEED;
