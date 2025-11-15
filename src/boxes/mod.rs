@@ -40,11 +40,12 @@ fn spawn_box(
 
             match entry {
                 SpawnItem::Good(files) => {
-                    let path = files.choose(&mut rand::rng()).unwrap();
+                    let (path, color) = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
                         GoodBox,
                         Sprite {
+                            color: (*color).into(),
                             image: asset_server.load(format!("good/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                             ..Default::default()
@@ -52,11 +53,12 @@ fn spawn_box(
                     ));
                 }
                 SpawnItem::Bad(files) => {
-                    let path = files.choose(&mut rand::rng()).unwrap();
+                    let (path, color) = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
                         BadBox,
                         Sprite {
+                            color: (*color).into(),
                             image: asset_server.load(format!("bad/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                             ..Default::default()

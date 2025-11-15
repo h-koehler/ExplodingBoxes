@@ -1,4 +1,7 @@
-use crate::room::{Movable, ROOM_HEIGHT, ROOM_WIDTH};
+use crate::{
+    room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
+    ui::UI_HEIGHT,
+};
 use bevy::prelude::*;
 
 pub mod swat;
@@ -71,8 +74,8 @@ fn apply_velocity(
 
         let min_x = -half_width + half_player_width + ROOM_INSET;
         let max_x = half_width - half_player_width - ROOM_INSET;
-        let min_y = -half_height + half_player_height + ROOM_INSET;
-        let max_y = half_height - half_player_height - ROOM_INSET;
+        let min_y = UI_HEIGHT / 2.0 + -half_height + half_player_height + ROOM_INSET;
+        let max_y = UI_HEIGHT / 2.0 + half_height - half_player_height - ROOM_INSET;
 
         trans.translation.x = trans.translation.x.clamp(min_x, max_x);
         trans.translation.y = trans.translation.y.clamp(min_y, max_y);
