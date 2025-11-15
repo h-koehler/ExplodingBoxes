@@ -22,7 +22,6 @@ pub const ROOM_WIDTH: u32 = 1100;
 
 pub const CONVEYOR_SIZE: u32 = 50;
 pub const CONVEYOR_SPEED: f32 = 100.0;
-pub const GOAL_SIZE: f32 = CONVEYOR_SIZE as f32 / 4.0;
 
 pub const X_OFFSET: f32 = -(ROOM_WIDTH as f32 / 2.0) + (CONVEYOR_SIZE as f32 / 2.0);
 pub const Y_OFFSET: f32 = ROOM_HEIGHT as f32 / 2.0 - (CONVEYOR_SIZE as f32 / 2.0);
@@ -83,13 +82,23 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         &mut commands,
         &asset_server,
         1,
-        1,
+        2,
         9,
         Vec2::X,
         1,
         Vec2::X,
         Vec2::X,
     );
+
+    // Last conveyor is the box goal.
+    let mut conveyor_commands = create_conveyor(
+        &mut commands,
+        &asset_server,
+        ROOM_WIDTH / CONVEYOR_SIZE - 2,
+        9,
+        Vec2::X,
+    );
+    conveyor_commands.insert(BoxGoal);
 }
 
 fn create_conveyor<'a>(

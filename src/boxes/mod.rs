@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::{prelude::*, time::common_conditions::on_timer};
 
-use crate::room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, GOAL_SIZE, Movable};
+use crate::room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable};
 
 #[derive(Component)]
 pub struct Box;
@@ -35,14 +35,14 @@ fn kill_box(
     q_box_goal_transform: Query<&Transform, With<BoxGoal>>,
 ) {
     for goal_transform in q_box_goal_transform.iter() {
-        let goal_min_x = goal_transform.translation.x - GOAL_SIZE;
-        let goal_max_x = goal_transform.translation.x + GOAL_SIZE;
-        let goal_min_y = goal_transform.translation.y - GOAL_SIZE;
-        let goal_max_y = goal_transform.translation.y + GOAL_SIZE;
+        let goal_min_x = goal_transform.translation.x - (CONVEYOR_SIZE as f32 / 2.0);
+        let goal_max_x = goal_transform.translation.x + (CONVEYOR_SIZE as f32 / 2.0);
+        let goal_min_y = goal_transform.translation.y - (CONVEYOR_SIZE as f32 / 2.0);
+        let goal_max_y = goal_transform.translation.y + (CONVEYOR_SIZE as f32 / 2.0);
         for (box_entity, box_transform) in q_box.iter() {
             let x = box_transform.translation.x;
             let y = box_transform.translation.y;
-            if x > goal_min_x && x < goal_max_x && y > goal_min_y && y > goal_max_y {
+            if x >= goal_min_x && x <= goal_max_x && y >= goal_min_y && y <= goal_max_y {
                 commands.entity(box_entity).despawn();
             }
         }
