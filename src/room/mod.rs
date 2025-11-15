@@ -33,9 +33,14 @@ fn setup_window_resolution(mut q_window: Query<&mut Window, With<PrimaryWindow>>
 }
 
 fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // First conveyor is the box spawner.
+    let mut conveyor_commands = create_conveyor(&mut commands, &asset_server, 1, 3, Vec2::X);
+    conveyor_commands.insert(BoxSpawner);
+
     create_line(
         &mut commands,
         &asset_server,
+        2,
         1,
         3,
         Vec2::X,
@@ -63,6 +68,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         &mut commands,
         &asset_server,
         1,
+        1,
         6,
         Vec2::NEG_X,
         1,
@@ -77,6 +83,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
         &mut commands,
         &asset_server,
         1,
+        1,
         9,
         Vec2::X,
         1,
@@ -85,13 +92,13 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
     );
 }
 
-fn create_conveyor(
-    commands: &mut Commands,
+fn create_conveyor<'a>(
+    commands: &'a mut Commands,
     asset_server: &AssetServer,
     x: u32,
     y: u32,
     direction: Vec2,
-) {
+) -> EntityCommands<'a> {
     commands.spawn((
         Sprite {
             image: asset_server.load("smile.png"),
@@ -104,22 +111,23 @@ fn create_conveyor(
             1.0,
         )),
         Conveyor { direction },
-    ));
+    ))
 }
 
 fn create_line(
     commands: &mut Commands,
     asset_server: &AssetServer,
-    start_x: u32,
+    start_x_offset: u32,
+    end_x_offset: u32,
     y: u32,
     direction: Vec2,
     x_dir: i32,
     first_dir: Vec2,
     last_dir: Vec2,
 ) {
-    let n = ROOM_WIDTH / CONVEYOR_SIZE - start_x;
-    for x in start_x..n {
-        let dir = if x == start_x {
+    let n = ROOM_WIDTH / CONVEYOR_SIZE - end_x_offset;
+    for x in start_x_offset..n {
+        let dir = if x == start_x_offset {
             first_dir
         } else if x == n - 1 {
             last_dir
