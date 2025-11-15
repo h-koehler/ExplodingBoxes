@@ -40,34 +40,37 @@ fn spawn_box(
             ));
 
             match entry {
-                SpawnItem::Good(_) => {
+                SpawnItem::Good(files) => {
                     let good_files = WalkDir::new("./assets/good");
                     let neutral_files = WalkDir::new("./assets/neutral");
 
-                    let (bevy_path, color) = get_bevy_path(good_files, neutral_files);
+                    // let (bevy_path, color) = get_bevy_path(good_files, neutral_files);
+                    let path = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
                         GoodBox,
                         Sprite {
-                            image: asset_server.load(bevy_path),
+                            image: asset_server.load(format!("good/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
-                            color: color.into(),
+                            // color: color.into(),
                             ..Default::default()
                         },
                     ));
                 }
-                SpawnItem::Bad(_) => {
+                SpawnItem::Bad(files) => {
                     let bad_files = WalkDir::new("./assets/bad");
                     let neutral_files = WalkDir::new("./assets/neutral");
 
-                    let (bevy_path, color) = get_bevy_path(bad_files, neutral_files);
+                    // let (bevy_path, color) = get_bevy_path(bad_files, neutral_files);
+
+                    let path = files.choose(&mut rand::rng()).unwrap();
 
                     ecmds.insert((
                         BadBox,
                         Sprite {
-                            image: asset_server.load(bevy_path),
+                            image: asset_server.load(format!("bad/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
-                            color: color.into(),
+                            // color: color.into(),
                             ..Default::default()
                         },
                     ));
