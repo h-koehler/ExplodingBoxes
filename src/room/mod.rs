@@ -5,6 +5,8 @@ use bevy::{
     window::{PrimaryWindow, WindowResolution},
 };
 
+use crate::ui::UI_HEIGHT;
+
 #[derive(Component)]
 pub struct Movable;
 
@@ -27,12 +29,7 @@ pub const CONVEYOR_SIZE: u32 = 50;
 pub const CONVEYOR_SPEED: f32 = 100.0;
 
 pub const X_OFFSET: f32 = -(ROOM_WIDTH as f32 / 2.0) + (CONVEYOR_SIZE as f32 / 2.0);
-pub const Y_OFFSET: f32 = ROOM_HEIGHT as f32 / 2.0 - (CONVEYOR_SIZE as f32 / 2.0);
-
-fn setup_window_resolution(mut q_window: Query<&mut Window, With<PrimaryWindow>>) {
-    let mut win = q_window.single_mut().unwrap();
-    win.resolution = WindowResolution::new(ROOM_WIDTH, ROOM_HEIGHT);
-}
+pub const Y_OFFSET: f32 = ROOM_HEIGHT as f32 / 2.0 - (CONVEYOR_SIZE as f32 / 2.0) + UI_HEIGHT;
 
 fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
     // First conveyor is the box spawner.
@@ -46,7 +43,7 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
             image: asset_server.load("background.png"),
             ..Default::default()
         },
-        Transform::from_translation(Vec3::NEG_Z * 10.0),
+        Transform::from_translation(Vec3::new(0.0, UI_HEIGHT / 2.0, -10.0)),
     ));
 
     create_line(
@@ -254,7 +251,7 @@ fn rects_overlap(a: &Rect, b: &Rect) -> bool {
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Startup, (setup_room, setup_window_resolution));
+    app.add_systems(Startup, setup_room);
 
     app.add_systems(Update, move_thing_on_conveyor);
 }
