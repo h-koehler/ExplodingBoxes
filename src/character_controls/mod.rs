@@ -19,22 +19,27 @@ pub struct Velocity {
 
 fn player_input(
     inputs: Res<ButtonInput<KeyCode>>,
-    mut q_player: Query<&mut Velocity, With<Character>>,
+    mut q_player: Query<(&mut Velocity, &mut Sprite), With<Character>>,
+    profiles: Res<PlayerProfiles>,
 ) {
-    let mut char_vel = q_player.single_mut().expect("No Player Object");
+    let (mut char_vel, mut sprite) = q_player.single_mut().expect("No Player Object");
     let mut dir = Vec2::ZERO;
 
-    if inputs.pressed(KeyCode::KeyW) {
-        dir.y += VELOCITY_CHANGE;
-    }
-    if inputs.pressed(KeyCode::KeyS) {
-        dir.y -= VELOCITY_CHANGE;
-    }
     if inputs.pressed(KeyCode::KeyA) {
         dir.x -= VELOCITY_CHANGE;
+        sprite.image = profiles.left.clone();
     }
     if inputs.pressed(KeyCode::KeyD) {
         dir.x += VELOCITY_CHANGE;
+        sprite.image = profiles.right.clone();
+    }
+    if inputs.pressed(KeyCode::KeyW) {
+        dir.y += VELOCITY_CHANGE;
+        sprite.image = profiles.up.clone();
+    }
+    if inputs.pressed(KeyCode::KeyS) {
+        dir.y -= VELOCITY_CHANGE;
+        sprite.image = profiles.down.clone();
     }
 
     char_vel.linear_velocity = char_vel
@@ -90,10 +95,27 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
+#[derive(Resource)]
+struct PlayerProfiles {
+    left: Handle<Image>,
+    right: Handle<Image>,
+    up: Handle<Image>,
+    down: Handle<Image>,
+}
+
+fn load_profiles(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(PlayerProfiles {
+        up: asset_server.load("player_up.png"),
+        down: asset_server.load("player.png"),
+        left: asset_server.load("player_left.png"),
+        right: asset_server.load("player_right.png"),
+    });
+}
+
 pub(super) fn register(app: &mut App) {
     swat::register(app);
 
-    app.add_systems(Startup, setup);
+    app.add_systems(Startup, (setup, load_profiles));
     app.add_systems(Update, player_input);
     app.add_systems(PostUpdate, apply_velocity);
 }

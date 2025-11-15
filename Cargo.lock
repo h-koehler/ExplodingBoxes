@@ -7,6 +7,8 @@ name = "ExplodingBoxes"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "rand",
+ "walkdir",
 ]
 
 [[package]]
