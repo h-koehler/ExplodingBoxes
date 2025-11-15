@@ -2,7 +2,10 @@ use std::time::Duration;
 
 use bevy::{prelude::*, time::common_conditions::on_timer};
 
-use crate::room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable};
+use crate::{
+    character_controls::{Velocity, swat::Swatted},
+    room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable},
+};
 
 pub mod explode;
 
@@ -21,6 +24,7 @@ fn spawn_box(
         commands.spawn((
             GameBox,
             Movable,
+            Velocity::default(),
             Sprite {
                 image: asset_server.load("green_box.png"),
                 custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
@@ -33,7 +37,7 @@ fn spawn_box(
 
 fn kill_box(
     mut commands: Commands,
-    q_box: Query<(Entity, &Transform), With<GameBox>>,
+    q_box: Query<(Entity, &Transform), (With<GameBox>, Without<Swatted>)>,
     q_box_goal_transform: Query<&Transform, With<BoxGoal>>,
 ) {
     for goal_transform in q_box_goal_transform.iter() {

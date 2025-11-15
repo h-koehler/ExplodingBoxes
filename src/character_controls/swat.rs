@@ -8,7 +8,7 @@ use crate::{
 #[derive(Component)]
 pub struct Swatted;
 
-const SWAT_VEL: f32 = 400.0;
+const SWAT_VEL: f32 = 1000.0;
 
 fn on_swat(
     q_player: Query<&Transform, With<Character>>,
@@ -37,7 +37,7 @@ fn find_near_box(
     let Some((_, new_near, _)) = q_box
         .iter()
         .map(|(e, t)| (t.translation.distance_squared(trans.translation), e, t))
-        .filter(|(dist, _, _)| *dist < 50.0)
+        .filter(|(dist, _, _)| *dist < 50.0 * 50.0)
         .min_by(|a, b| a.0.partial_cmp(&b.0).unwrap())
     else {
         if let Ok(ent) = q_selected.single() {
