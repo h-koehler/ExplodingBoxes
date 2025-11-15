@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod boxes;
 pub mod character_controls;
 
 fn main() {
@@ -8,6 +9,7 @@ fn main() {
     app.add_plugins(DefaultPlugins);
 
     character_controls::register(&mut app);
+    boxes::register(&mut app);
 
     app.run();
 }
