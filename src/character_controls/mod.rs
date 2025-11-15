@@ -36,7 +36,7 @@ fn player_input(
         dir.x += VELOCITY_CHANGE;
     }
 
-    char_vel.linear_velocity = dir.normalize_or_zero() * MOVE_SPEED;
+    char_vel.linear_velocity = char_vel.linear_velocity.lerp(dir.normalize_or_zero() * MOVE_SPEED, 0.1);
 }
 
 fn apply_velocity (
