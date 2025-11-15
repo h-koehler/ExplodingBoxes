@@ -7,14 +7,21 @@ use bevy::{
 pub struct Movable;
 
 #[derive(Component)]
-struct Conveyor {
+pub struct Conveyor {
     pub direction: Vec2,
 }
+
+#[derive(Component)]
+pub struct BoxSpawner;
+
+#[derive(Component)]
+pub struct BoxGoal;
 
 pub const ROOM_HEIGHT: u32 = 700;
 pub const ROOM_WIDTH: u32 = 1100;
 
-const CONVEYOR_SIZE: u32 = 50;
+pub const CONVEYOR_SIZE: u32 = 50;
+pub const GOAL_SIZE: f32 = CONVEYOR_SIZE as f32 / 4.0;
 
 const X_OFFSET: f32 = -(ROOM_WIDTH as f32 / 2.0) + (CONVEYOR_SIZE as f32 / 2.0);
 const Y_OFFSET: f32 = ROOM_HEIGHT as f32 / 2.0 - (CONVEYOR_SIZE as f32 / 2.0);
