@@ -6,8 +6,8 @@ use rand::seq::IndexedRandom;
 use crate::{
     boxes::spawn::{SpawnItem, SpawnList},
     character_controls::{Velocity, swat::Swatted},
-    room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable},
     custom_utils::GameState,
+    room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable},
 };
 
 pub mod explode;
@@ -49,7 +49,8 @@ fn spawn_box(
                                 image: asset_server.load(format!("addons/{addon}.png")),
                                 custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                                 ..Default::default()
-                            }, Transform::from_translation(Vec3::Z)
+                            },
+                            Transform::from_translation(Vec3::Z),
                         ));
                     }
 
@@ -66,13 +67,14 @@ fn spawn_box(
                 SpawnItem::Bad(files) => {
                     let (path, color, addons) = files.choose(&mut rand::rng()).unwrap();
 
-                    for (addon) in addons.addons.iter() {
+                    for addon in addons.addons.iter() {
                         ecmds.with_child((
                             Sprite {
                                 image: asset_server.load(format!("addons/{addon}.png")),
                                 custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                                 ..Default::default()
-                            }, Transform::from_translation(Vec3::Z)
+                            },
+                            Transform::from_translation(Vec3::Z),
                         ));
                     }
 
@@ -136,9 +138,11 @@ pub(super) fn register(app: &mut App) {
     app.add_systems(
         Update,
         (
-            spawn_box.run_if(on_timer(Duration::from_secs_f32(
-                SECONDS_BETWEEN_BOX_SPAWNS,
-            ))).run_if(in_state(GameState::Running)),
+            spawn_box
+                .run_if(on_timer(Duration::from_secs_f32(
+                    SECONDS_BETWEEN_BOX_SPAWNS,
+                )))
+                .run_if(in_state(GameState::Running)),
             kill_box.run_if(in_state(GameState::Running)),
         ),
     )
