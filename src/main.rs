@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::WindowResolution};
-use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
+// use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 use crate::{
     room::{ROOM_HEIGHT, ROOM_WIDTH},
@@ -27,9 +27,9 @@ fn main() {
             }),
             ..Default::default()
         }),
-    )
-    .add_plugins(EguiPlugin::default())
-    .add_plugins(WorldInspectorPlugin::default());
+    );
+    // .add_plugins(EguiPlugin::default())
+    // .add_plugins(WorldInspectorPlugin::default());
 
     character_controls::register(&mut app);
     boxes::register(&mut app);
