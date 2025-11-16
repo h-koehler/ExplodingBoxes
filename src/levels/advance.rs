@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 
 use crate::{
     boxes::{GameBox, spawn::SpawnList},
@@ -17,6 +17,7 @@ fn advance_level(
     mut evw_win: MessageWriter<Win>,
     just_reset: Option<Res<JustReset>>,
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     commands.remove_resource::<JustReset>();
     if just_reset.is_some() {
@@ -25,6 +26,14 @@ fn advance_level(
     if !(spawn_boxes.entries.is_empty() && q_box.iter().next().is_none()) {
         return;
     }
+
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("sounds/level_up.ogg")),
+        PlaybackSettings {
+            volume: Volume::Linear(0.6),
+            ..Default::default()
+        },
+    ));
 
     if level.advance() {
         evw_win.write_default();

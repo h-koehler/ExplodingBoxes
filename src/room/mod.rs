@@ -126,7 +126,7 @@ fn create_conveyor_start(
         Transform::default().with_translation(Vec3::new(
             X_OFFSET + (x * CONVEYOR_SIZE) as f32,
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            2.9,
+            2.0,
         )),
     ));
     let mut conveyor_entity = create_conveyor(
@@ -160,7 +160,7 @@ fn create_conveyor_end(
         Transform::default().with_translation(Vec3::new(
             X_OFFSET + (x * CONVEYOR_SIZE) as f32,
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            2.9,
+            2.0,
         )),
     ));
     let mut conveyor_entity = create_conveyor(
@@ -324,14 +324,14 @@ fn load_sprites(mut commands: Commands, asset_loader: Res<AssetServer>) {
 
 fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
     // First conveyor is the box spawner.
-    create_conveyor_start(commands, asset_server, 1, 3, Vec2::X, None);
+    create_conveyor_start(commands, asset_server, 1, 5, Vec2::X, None);
 
     create_line_x(
         commands,
         asset_server,
         2,
         ROOM_CONVEYOR_WIDTH - 3,
-        3,
+        5,
         Vec2::X,
         Vec2::X,
     );
@@ -339,8 +339,8 @@ fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
     create_line_y(
         commands,
         asset_server,
-        3,
         5,
+        7,
         ROOM_CONVEYOR_WIDTH - 2,
         Vec2::NEG_Y,
         Vec2::X,
@@ -351,19 +351,19 @@ fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
         asset_server,
         ROOM_CONVEYOR_WIDTH - 2,
         2,
-        6,
+        8,
         Vec2::NEG_X,
         Vec2::NEG_Y,
     );
 
-    create_line_y(commands, asset_server, 6, 8, 1, Vec2::NEG_Y, Vec2::NEG_X);
+    create_line_y(commands, asset_server, 8, 10, 1, Vec2::NEG_Y, Vec2::NEG_X);
 
     create_line_x(
         commands,
         asset_server,
         1,
         ROOM_CONVEYOR_WIDTH - 3,
-        9,
+        11,
         Vec2::X,
         Vec2::NEG_Y,
     );
@@ -373,7 +373,7 @@ fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
         commands,
         asset_server,
         ROOM_CONVEYOR_WIDTH - 2,
-        9,
+        11,
         Vec2::X,
         None,
     );

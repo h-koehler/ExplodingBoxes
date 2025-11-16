@@ -112,7 +112,7 @@ fn kill_box(
     mut evw_box_made_it: MessageWriter<BoxMadeIt>,
 ) {
     for goal_transform in q_box_goal_transform.iter() {
-        let goal_min_x = goal_transform.translation.x - (CONVEYOR_SIZE as f32 / 2.0);
+        let goal_min_x = goal_transform.translation.x;
         let goal_max_x = goal_transform.translation.x + (CONVEYOR_SIZE as f32 / 2.0);
         let goal_min_y = goal_transform.translation.y - (CONVEYOR_SIZE as f32 / 2.0);
         let goal_max_y = goal_transform.translation.y + (CONVEYOR_SIZE as f32 / 2.0);
