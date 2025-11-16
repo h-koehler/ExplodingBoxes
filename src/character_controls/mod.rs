@@ -1,5 +1,8 @@
 use crate::{
-    custom_utils::GameState, room::{Movable, ROOM_HEIGHT, ROOM_WIDTH}, ui::UI_HEIGHT
+    character_controls::swat::DidBadSwat,
+    custom_utils::GameState,
+    room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
+    ui::UI_HEIGHT,
 };
 use bevy::prelude::*;
 
@@ -21,10 +24,12 @@ pub struct Velocity {
 
 fn player_input(
     inputs: Res<ButtonInput<KeyCode>>,
-    mut q_player: Query<(&mut Velocity, &mut Sprite), With<Character>>,
+    mut q_player: Query<(&mut Velocity, &mut Sprite), (With<Character>, Without<DidBadSwat>)>,
     profiles: Res<PlayerProfiles>,
 ) {
-    let (mut char_vel, mut sprite) = q_player.single_mut().expect("No Player Object");
+    let Ok((mut char_vel, mut sprite)) = q_player.single_mut() else {
+        return;
+    };
     let mut dir = Vec2::ZERO;
 
     if inputs.pressed(KeyCode::KeyA) {
@@ -51,14 +56,14 @@ fn player_input(
 
 fn apply_velocity(
     time: Res<Time>,
-    mut q_player: Query<(&mut Transform, &Velocity, Has<Character>)>,
+    mut q_player: Query<(&mut Transform, &Velocity, Has<Character>, Has<DidBadSwat>)>,
 ) {
     let dt = time.delta_secs();
-    for (mut trans, vel, is_player) in q_player.iter_mut() {
+    for (mut trans, vel, is_player, bad_swat) in q_player.iter_mut() {
         trans.translation.x += vel.linear_velocity.x * dt;
         trans.translation.y += vel.linear_velocity.y * dt;
 
-        if !is_player {
+        if !is_player || bad_swat {
             continue;
         }
 
@@ -119,5 +124,5 @@ pub(super) fn register(app: &mut App) {
 
     app.add_systems(Startup, (setup, load_profiles));
     app.add_systems(Update, player_input.run_if(in_state(GameState::Running)));
-    app.add_systems(PostUpdate, apply_velocity.run_if(in_state(GameState::Running)));
+    app.add_systems(PostUpdate, apply_velocity);
 }
