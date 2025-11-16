@@ -41,7 +41,17 @@ fn spawn_box(
 
             match entry {
                 SpawnItem::Good(files) => {
-                    let (path, color) = files.choose(&mut rand::rng()).unwrap();
+                    let (path, color, addons) = files.choose(&mut rand::rng()).unwrap();
+
+                    for (addon) in addons.addons.iter() {
+                        ecmds.with_child((
+                            Sprite {
+                                image: asset_server.load(format!("addons/{addon}.png")),
+                                custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
+                                ..Default::default()
+                            }, Transform::from_translation(Vec3::Z)
+                        ));
+                    }
 
                     ecmds.insert((
                         GoodBox,
@@ -54,7 +64,17 @@ fn spawn_box(
                     ));
                 }
                 SpawnItem::Bad(files) => {
-                    let (path, color) = files.choose(&mut rand::rng()).unwrap();
+                    let (path, color, addons) = files.choose(&mut rand::rng()).unwrap();
+
+                    for (addon) in addons.addons.iter() {
+                        ecmds.with_child((
+                            Sprite {
+                                image: asset_server.load(format!("addons/{addon}.png")),
+                                custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
+                                ..Default::default()
+                            }, Transform::from_translation(Vec3::Z)
+                        ));
+                    }
 
                     ecmds.insert((
                         BadBox,
