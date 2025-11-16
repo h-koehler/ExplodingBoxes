@@ -1,6 +1,9 @@
 use bevy::{color::palettes::css, prelude::*};
 
-use crate::ui::button::{ButtonMessage, ButtonStyles, CosmosButton};
+use crate::{
+    levels::level_select::{self, show_select_screen},
+    ui::button::{ButtonMessage, ButtonStyles, CosmosButton},
+};
 
 pub const LEVEL_SELECT: &str = "LEVEL SELECT";
 
@@ -73,7 +76,13 @@ fn toggle_pause(
                             },
                             BorderColor::all(css::BLACK),
                         ))
-                        .observe(|trigger: On<ButtonMessage>| {});
+                        .observe(
+                            |trigger: On<ButtonMessage>,
+                             commands: Commands,
+                             asset_server: Res<AssetServer>| {
+                                show_select_screen(commands, asset_server);
+                            },
+                        );
                     });
             }
             GameState::Paused => {
