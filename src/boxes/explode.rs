@@ -5,8 +5,10 @@ use bevy::{audio::Volume, prelude::*};
 use rand::Rng;
 
 use crate::{
+    boss_cat::Delay,
     boxes::{BadBox, BoxMadeIt, GameBox, GoodBox},
     character_controls::camera_shake::CameraShake,
+    character_controls::{Character, Velocity},
     custom_utils::GameState,
     room::{ROOM_HEIGHT, ROOM_WIDTH},
     ui::loss::LossReason,
@@ -20,6 +22,8 @@ fn box_swatted(
     asset_server: Res<AssetServer>,
     q_box: Query<(&Transform, Entity, Has<GoodBox>, Has<BadBox>), With<GameBox>>,
     q_camera: Query<Entity, With<Camera2d>>,
+    mut next_state: ResMut<NextState<GameState>>,
+    q_player: Query<Entity, With<Character>>,
 ) {
     // Doubled to delay sound effects and avoid despawning boxes on the screen.
     let min_x = -(ROOM_WIDTH as f32);
@@ -45,6 +49,11 @@ fn box_swatted(
                         ..Default::default()
                     },
                 ));
+                commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+                next_state.set(GameState::BossCatTime);
+                commands
+                    .entity(q_player.single().expect("no player ;("))
+                    .insert(Velocity::default());
             }
             commands.entity(bad_box_entity).despawn();
         }

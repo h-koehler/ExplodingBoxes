@@ -1,17 +1,20 @@
 use crate::{
-    boxes::{BoxKicked, BoxMadeIt},
+    boxes::BoxMadeIt,
     character_controls::{Character, Velocity, swat::DidBadSwat},
-    custom_utils::GameState,
     room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
     ui::loss::{LossReason, LossScreen},
 };
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
+use rand::Rng;
 
 const BOSS_ASS_PATH: &str = "boss-cat-angy.png";
 const BOSS_SIZE: Vec2 = Vec2::new(200.0, 200.0);
 const BOSS_SPAWN_OFFSET: f32 = 200.0;
 const BOSS_SPEED: f32 = 120.0;
-const TOP_QUARTER_MIN_Y_FACTOR: f32 = 0.25;
+
+const TALKING_RAND_MAX: i32 = 50;
+const MEOW_RAND_VALUE: i32 = 1;
+const EXIT_RAND_VALUE: i32 = 50;
 
 #[derive(Component)]
 pub struct BossCat;
@@ -25,15 +28,12 @@ enum BossState {
 }
 
 #[derive(Resource)]
-struct Delay(Timer);
+pub struct Delay(pub Timer);
 
 // Boss cat boutta pull up
 fn boss_spawning_system(
     mut commands: Commands,
     mut madeit_message_reader: MessageReader<BoxMadeIt>,
-    mut kicked_message_reader: MessageReader<BoxKicked>,
-    mut next_state: ResMut<NextState<GameState>>,
-    q_player: Query<Entity, With<Character>>,
 ) {
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
@@ -41,16 +41,16 @@ fn boss_spawning_system(
         }
     }
 
-    for msg in kicked_message_reader.read() {
-        if let BoxKicked::GoodBox = msg {
-            commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
-            commands.insert_resource(LossReason::BadKick);
-            next_state.set(GameState::BossCatTime);
-            commands
-                .entity(q_player.single().expect("no player ;("))
-                .insert(Velocity::default());
-        }
-    }
+    // Moved to when the good box shatters, like the boss heard the shatter and pulls up.
+    // for msg in kicked_message_reader.read() {
+    //     if let BoxKicked::GoodBox = msg {
+    //         commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+    //         next_state.set(GameState::BossCatTime);
+    //         commands
+    //             .entity(q_player.single().expect("no player ;("))
+    //             .insert(Velocity::default());
+    //     }
+    // }
 }
 
 fn boss_movement_system(
@@ -58,11 +58,13 @@ fn boss_movement_system(
     mut q: Query<(&mut Transform, &mut BossState), With<BossCat>>,
     q_player: Query<Entity, With<Character>>,
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     let dt = time.delta_secs();
     for (mut transform, mut state) in q.iter_mut() {
         match &mut *state {
             BossState::Entering { target_y, target_x } => {
+                let y_speed = (BOSS_SPEED * dt).min((transform.translation.y - *target_y).abs());
                 let y_dir = if transform.translation.y > *target_y {
                     -1.0
                 } else if transform.translation.y < *target_y {
@@ -70,8 +72,9 @@ fn boss_movement_system(
                 } else {
                     0.0
                 };
-                transform.translation.y += y_dir * BOSS_SPEED * dt;
+                transform.translation.y += y_dir * y_speed;
 
+                let x_speed = (BOSS_SPEED * dt).min((transform.translation.x - *target_x).abs());
                 let x_dir = if transform.translation.x > *target_x {
                     -1.0
                 } else if transform.translation.x < *target_x {
@@ -79,8 +82,7 @@ fn boss_movement_system(
                 } else {
                     0.0
                 };
-
-                transform.translation.x += x_dir * BOSS_SPEED * dt;
+                transform.translation.x += x_dir * x_speed;
 
                 if transform.translation.y <= *target_y + 1.0
                     && transform.translation.x <= *target_x + 1.0
@@ -92,7 +94,19 @@ fn boss_movement_system(
             }
             BossState::Talking => {
                 // boss stands still, asserting his dominance
-                *state = BossState::Exiting;
+                let mut rng = rand::rng();
+                let random_number: i32 = rng.random_range(1..=TALKING_RAND_MAX);
+                if random_number <= MEOW_RAND_VALUE {
+                    commands.spawn((
+                        AudioPlayer::new(asset_server.load("sounds/meow.ogg")),
+                        PlaybackSettings {
+                            volume: Volume::Linear(random_number as f32 / MEOW_RAND_VALUE as f32),
+                            ..Default::default()
+                        },
+                    ));
+                } else if random_number >= EXIT_RAND_VALUE {
+                    *state = BossState::Exiting;
+                }
             }
             BossState::Exiting => {
                 if let Ok(player_ent) = q_player.single() {
