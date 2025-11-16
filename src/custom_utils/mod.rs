@@ -1,7 +1,7 @@
 use bevy::{color::palettes::css, prelude::*};
 
 use crate::{
-    levels::level_select::{self, show_select_screen},
+    levels::level_select::show_select_screen,
     ui::button::{ButtonMessage, ButtonStyles, CosmosButton},
 };
 

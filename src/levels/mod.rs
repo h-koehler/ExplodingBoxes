@@ -239,7 +239,7 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["How Many Sides Does a Square Have?".into()],
+                additional_text: vec!["Fear the fourth of every square!".into()],
                 // "how many sides does a square have?"
             });
         }
@@ -337,7 +337,7 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Copy cat.".into()],
+                additional_text: vec!["Circles like to follow the leader...".into()],
             });
         }
         Level::Five => {
@@ -397,7 +397,7 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec![],
+                additional_text: vec!["Plus signs are copycats! Pay attention to their leader.".into()],
             });
         }
     }
