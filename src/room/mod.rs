@@ -43,7 +43,10 @@ fn setup_room(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Name::new("Background"),
         Sprite {
-            custom_size: Some(Vec2::new(ROOM_WIDTH as f32, ROOM_HEIGHT as f32)),
+            custom_size: Some(Vec2::new(
+                ROOM_WIDTH as f32 + 20.0,
+                ROOM_HEIGHT as f32 + 20.0,
+            )),
             image: asset_server.load("background.png"),
             ..Default::default()
         },
