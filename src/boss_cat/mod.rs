@@ -8,7 +8,7 @@ use bevy::prelude::*;
 
 const BOSS_ASS_PATH: &str = "boss-cat-angy.png";
 const BOSS_SIZE: Vec2 = Vec2::new(200.0, 200.0);
-const BOSS_SPAWN_OFFSET: f32 = 50.0;
+const BOSS_SPAWN_OFFSET: f32 = 200.0;
 const BOSS_SPEED: f32 = 120.0;
 const TOP_QUARTER_MIN_Y_FACTOR: f32 = 0.25;
 
@@ -31,6 +31,8 @@ fn boss_spawning_system(
     mut commands: Commands,
     mut madeit_message_reader: MessageReader<BoxMadeIt>,
     mut kicked_message_reader: MessageReader<BoxKicked>,
+    mut next_state: ResMut<NextState<GameState>>,
+    q_player: Query<Entity, With<Character>>,
 ) {
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
@@ -41,6 +43,10 @@ fn boss_spawning_system(
     for msg in kicked_message_reader.read() {
         if let BoxKicked::GoodBox = msg {
             commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+            next_state.set(GameState::BossCatTime);
+            commands
+                .entity(q_player.single().expect("no player ;("))
+                .insert(Velocity::default());
         }
     }
 }
