@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css, prelude::*};
+use bevy::prelude::*;
 
 use crate::levels::Level;
 
@@ -15,6 +15,7 @@ pub enum BadAttributes {
 #[derive(Resource)]
 pub struct UIBad {
     pub bad_attributes: Vec<BadAttributes>,
+    pub additional_text: Vec<String>,
 }
 
 fn create_ui(

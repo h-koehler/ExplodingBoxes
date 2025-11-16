@@ -12,13 +12,12 @@ pub struct Swatted;
 const SWAT_VEL: f32 = 1000.0;
 
 fn on_swat(
-    q_player: Query<(Entity, &Transform), With<Character>>,
+    q_player: Query<&Transform, With<Character>>,
     mut q_swatted: Query<(&mut Velocity, &Transform, Has<GoodBox>), Added<Swatted>>,
     mut message_writer: MessageWriter<BoxKicked>,
-    mut commands: Commands,
 ) {
     for (mut vel, swatted_trans, is_good) in q_swatted.iter_mut() {
-        let (player_entity, player_transform) = q_player.single().expect("no player trans");
+        let player_transform = q_player.single().expect("no player trans");
         vel.linear_velocity += (swatted_trans.translation - player_transform.translation)
             .normalize_or(Vec3::Y)
             .xy()
@@ -31,13 +30,20 @@ fn on_swat(
     }
 }
 
+#[derive(Resource)]
+struct Belt(Handle<AudioSource>);
+
+fn load_belt_sound(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(Belt(asset_server.load("sounds/belt.ogg")));
+}
+
 fn boss_swat(
     mut q_player_velocity: Query<&mut Velocity, Added<DidBadSwat>>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    belt: Res<Belt>,
 ) {
     for mut vel in q_player_velocity.iter_mut() {
-        commands.spawn(AudioPlayer::new(asset_server.load("sounds/belt.ogg")));
+        commands.spawn(AudioPlayer::new(belt.0.clone()));
 
         vel.linear_velocity.x = SWAT_VEL;
         vel.linear_velocity.y = SWAT_VEL;
@@ -94,6 +100,8 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
+    app.add_systems(Startup, load_belt_sound);
+
     app.add_systems(
         Update,
         (

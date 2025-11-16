@@ -3,7 +3,9 @@ use bevy::{audio::Volume, prelude::*};
 use rand::Rng;
 
 use crate::{
+    boss_cat::Delay,
     boxes::{BadBox, BoxMadeIt, GameBox, GoodBox},
+    character_controls::{Character, Velocity},
     custom_utils::GameState,
     room::{ROOM_HEIGHT, ROOM_WIDTH},
 };
@@ -15,6 +17,8 @@ fn box_swatted(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     q_box: Query<(&Transform, Entity, Has<GoodBox>, Has<BadBox>), With<GameBox>>,
+    mut next_state: ResMut<NextState<GameState>>,
+    q_player: Query<Entity, With<Character>>,
 ) {
     // Doubled to delay sound effects and avoid despawning boxes on the screen.
     let min_x = -(ROOM_WIDTH as f32);
@@ -26,10 +30,7 @@ fn box_swatted(
         let y = bad_box_transform.translation.y;
         if x < min_x || x > max_x || y < min_y || y > max_y {
             if bad_box {
-                let mut rng = rand::rng();
-                let random_number: i32 = rng.random_range(1..=3);
-                let sound_file_name = format!("sounds/explosion_{}.ogg", random_number);
-                commands.spawn(AudioPlayer::new(asset_server.load(sound_file_name)));
+                commands.spawn(AudioPlayer::new(asset_server.load("sounds/explosion.ogg")));
             } else if good_box {
                 commands.spawn((
                     AudioPlayer::new(asset_server.load("sounds/glass_shatter.ogg")),
@@ -38,6 +39,11 @@ fn box_swatted(
                         ..Default::default()
                     },
                 ));
+                commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+                next_state.set(GameState::BossCatTime);
+                commands
+                    .entity(q_player.single().expect("no player ;("))
+                    .insert(Velocity::default());
             }
             commands.entity(bad_box_entity).despawn();
         }

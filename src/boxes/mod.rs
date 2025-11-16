@@ -43,7 +43,7 @@ fn spawn_box(
                 SpawnItem::Good(files) => {
                     let (path, color, addons) = files.choose(&mut rand::rng()).unwrap();
 
-                    for (addon) in addons.addons.iter() {
+                    for addon in addons.addons.iter() {
                         ecmds.with_child((
                             Sprite {
                                 image: asset_server.load(format!("addons/{addon}.png")),
@@ -58,7 +58,7 @@ fn spawn_box(
                         GoodBox,
                         Sprite {
                             color: (*color).into(),
-                            image: asset_server.load(format!("good/{path}.png")),
+                            image: asset_server.load(format!("neutral/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                             ..Default::default()
                         },
@@ -82,7 +82,7 @@ fn spawn_box(
                         BadBox,
                         Sprite {
                             color: (*color).into(),
-                            image: asset_server.load(format!("bad/{path}.png")),
+                            image: asset_server.load(format!("neutral/{path}.png")),
                             custom_size: Some(Vec2::new(BOX_SIZE, BOX_SIZE)),
                             ..Default::default()
                         },
