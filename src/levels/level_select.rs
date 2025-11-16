@@ -91,9 +91,12 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                         Name::new(format!("Level {level_num}")),
                         Node {
                             margin: UiRect::all(Val::Px(50.0)),
+                            border: UiRect::all(Val::Px(3.0)),
+                            padding: UiRect::all(Val::Px(5.0)),
                             ..Default::default()
                         },
-                        ImageNode::new(asset_server.load("ui_elements/level_num_bg.png")),
+                        BorderColor::all(css::BLACK),
+                        BorderRadius::all(Val::Px(4.0)),
                     ))
                     .observe(
                         move |trigger: On<ButtonMessage>, mut commands: Commands, mut level: ResMut<Level>, q_pause: Query<Entity, With<PauseMenu>>, q_level_select_menu: Query<Entity, With<LevelSelectMenu>>| {
