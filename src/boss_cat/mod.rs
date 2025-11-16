@@ -1,6 +1,5 @@
 use crate::{
-    boxes::{BoxKicked, BoxMadeIt},
-    room::{Movable, ROOM_HEIGHT},
+    boxes::{BoxKicked, BoxMadeIt}, custom_utils::GameState, room::{Movable, ROOM_HEIGHT}
 };
 use bevy::prelude::*;
 
@@ -27,6 +26,7 @@ fn boss_spawning_system(
     asset_server: Res<AssetServer>,
     mut madeit_message_reader: MessageReader<BoxMadeIt>,
     mut kicked_message_reader: MessageReader<BoxKicked>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     let half_h = ROOM_HEIGHT as f32 / 2.0;
     let spawn_y = half_h + BOSS_SPAWN_OFFSET;
@@ -36,12 +36,14 @@ fn boss_spawning_system(
 
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
+            next_state.set(GameState::BossCatTime);
             spawn_boss(&mut commands, &asset_server, spawn_y, target_y);
         }
     }
 
     for msg in kicked_message_reader.read() {
         if let BoxKicked::GoodBox = msg {
+            next_state.set(GameState::BossCatTime);
             spawn_boss(&mut commands, &asset_server, spawn_y, target_y);
         }
     }

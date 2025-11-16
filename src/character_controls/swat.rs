@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     boxes::{BoxKicked, GameBox, GoodBox},
-    character_controls::{Character, Velocity},
+    character_controls::{Character, Velocity}, custom_utils::GameState,
 };
 
 #[derive(Component)]
@@ -74,5 +74,5 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, (find_near_box, swat, on_swat).chain());
+    app.add_systems(Update, (find_near_box, swat, on_swat).run_if(in_state(GameState::Running)).chain());
 }
