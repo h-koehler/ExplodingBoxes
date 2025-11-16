@@ -2,7 +2,7 @@ use crate::{
     boxes::{BoxKicked, BoxMadeIt},
     character_controls::{Character, Velocity, swat::DidBadSwat},
     custom_utils::GameState,
-    room::{Movable, ROOM_HEIGHT},
+    room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
 };
 use bevy::prelude::*;
 
@@ -17,7 +17,7 @@ pub struct BossCat;
 
 #[derive(Component)]
 enum BossState {
-    Entering { target_y: f32 },
+    Entering { target_y: f32, target_x: f32 },
     Talking,
     Exiting,
     Done,
@@ -54,16 +54,29 @@ fn boss_movement_system(
     let dt = time.delta_secs();
     for (mut transform, mut state) in q.iter_mut() {
         match &mut *state {
-            BossState::Entering { target_y } => {
-                let dir = if transform.translation.y > *target_y {
+            BossState::Entering { target_y, target_x } => {
+                let y_dir = if transform.translation.y > *target_y {
                     -1.0
+                } else if transform.translation.y < *target_y {
+                    1.0
                 } else {
                     0.0
                 };
-                transform.translation.y += dir * BOSS_SPEED * dt;
+                transform.translation.y += y_dir * BOSS_SPEED * dt;
 
-                if transform.translation.y <= *target_y + 1.0 {
+                let x_dir = if transform.translation.x > *target_x {
+                    -1.0
+                } else if transform.translation.x < *target_x {
+                    1.0
+                } else {
+                    1.0
+                };
+
+                transform.translation.x += x_dir * BOSS_SPEED * dt;
+
+                if transform.translation.y <= *target_y + 1.0 && transform.translation.y >= *target_x {
                     transform.translation.y = *target_y;
+                    transform.translation.x = *target_x;
                     *state = BossState::Talking;
                 }
             }
@@ -101,7 +114,7 @@ fn boss_delay_spawn_system(
     mut commands: Commands,
     delay: Option<ResMut<Delay>>,
     mut next_state: ResMut<NextState<GameState>>,
-    q_player: Query<Entity, With<Character>>,
+    q_player: Query<(Entity, &Transform), With<Character>>,
 ) {
     let Some(mut delay) = delay else { return };
 
@@ -111,27 +124,40 @@ fn boss_delay_spawn_system(
         commands.remove_resource::<Delay>();
         next_state.set(GameState::BossCatTime);
 
-        // --- spawn boss here ---
+        let (player_entity, player_transform) = match q_player.single() {
+            Ok(t) => t,
+            Err(_) => {
+                return;
+            }
+        };
+        let player_pos = player_transform.translation;
+
+        let half_w = ROOM_WIDTH as f32 / 2.0;
         let half_h = ROOM_HEIGHT as f32 / 2.0;
+
+        // boss spawning location
+        let spawn_x = half_w + BOSS_SPAWN_OFFSET;
         let spawn_y = half_h + BOSS_SPAWN_OFFSET;
 
-        let top_quarter_min = ROOM_HEIGHT as f32 * TOP_QUARTER_MIN_Y_FACTOR;
-        let target_y = (top_quarter_min + half_h) * 0.5;
-
+        // boss target location
+        // let top_quarter_min = ROOM_HEIGHT as f32 * TOP_QUARTER_MIN_Y_FACTOR;
+        let target_x = player_pos.x + 80.0;
+        let target_y = player_pos.y;
+        
         commands.spawn((
             BossCat,
             Movable,
-            BossState::Entering { target_y },
+            BossState::Entering { target_y, target_x },
             Sprite {
                 image: asset_server.load(BOSS_ASS_PATH),
                 custom_size: Some(BOSS_SIZE),
                 ..Default::default()
             },
-            Transform::from_translation(Vec3::new(0.0, spawn_y, 5.0)),
+            Transform::from_translation(Vec3::new(spawn_x, spawn_y, 5.0)),
         ));
 
         commands
-            .entity(q_player.single().unwrap())
+            .entity(player_entity)
             .insert(Velocity::default());
     }
 }
