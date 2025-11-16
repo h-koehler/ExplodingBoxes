@@ -1,6 +1,9 @@
 use bevy::{color::palettes::css, prelude::*};
 
-use crate::boxes::spawn::{SpawnItem, SpawnList};
+use crate::{
+    boxes::spawn::{SpawnItem, SpawnList},
+    ui::{BadAttributes, UIBad},
+};
 
 #[derive(Resource, Clone, Copy)]
 pub enum Level {
@@ -13,21 +16,26 @@ pub enum Level {
 
 fn setup_level(mut commands: Commands, level: Res<Level>) {
     match *level {
-        Level::One => commands.insert_resource(SpawnList {
-            entries: vec![
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Bad(vec![("simple", css::RED)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Bad(vec![("simple", css::RED)]),
-                SpawnItem::Bad(vec![("simple", css::RED)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-                SpawnItem::Good(vec![("simple", css::GREEN)]),
-            ],
-        }),
+        Level::One => {
+            commands.insert_resource(SpawnList {
+                entries: vec![
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Bad(vec![("simple", css::RED)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Bad(vec![("simple", css::RED)]),
+                    SpawnItem::Bad(vec![("simple", css::RED)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                ],
+            });
+            commands.insert_resource(UIBad {
+                bad_attributes: vec![BadAttributes::Color(css::RED)],
+            });
+        }
         _ => todo!(),
     }
 }
