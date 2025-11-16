@@ -131,6 +131,19 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                 // "how many sides does a square have?"
             });
         }
+        Level::Four => { // Introoduce circle - copy the behavior of the box in front of it -> DOES count as a square in the square sequence
+            commands.insert_resource(SpawnList {
+                entries: vec![
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("circle".into()))]), // COPY BAD
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
+                ],
+            });
+            commands.insert_resource(UIBad {
+                bad_attributes: vec![BadAttributes::Color(css::RED), BadAttributes::Symbol("square".into())],
+                // 
+            });
+        }
         _ => todo!(),
     }
 }
