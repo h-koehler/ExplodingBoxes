@@ -2,6 +2,8 @@ use bevy::{color::palettes::css, prelude::*};
 
 use crate::ui::button::{ButtonMessage, ButtonStyles, CosmosButton};
 
+pub const LEVEL_SELECT: &str = "LEVEL SELECT";
+
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum GameState {
     #[default]
@@ -39,34 +41,6 @@ fn toggle_pause(
                         ImageNode::new(asset_server.load("ui_elements/pause_menu.png")),
                     ))
                     .with_children(|p| {
-                        // p.spawn((
-                        //     CosmosButton{
-                        //         text: Option::
-                        //     },
-                        //     Node {
-                        //         width: px(150),
-                        //         height: px(65),
-                        //         border: UiRect::all(px(5)),
-                        //         // horizontally center child text
-                        //         justify_content: JustifyContent::Center,
-                        //         // vertically center child text
-                        //         align_items: AlignItems::Center,
-                        //         ..default()
-                        //     },
-                        //     BorderColor::all(Color::WHITE),
-                        //     BorderRadius::MAX,
-                        //     BackgroundColor(Color::BLACK),
-                        //     children![(
-                        //         Text::new("Button"),
-                        //         TextFont {
-                        //             font: asset_server.load("ui_elements/FiraSans-Bold.ttf"),
-                        //             font_size: 33.0,
-                        //             ..default()
-                        //         },
-                        //         TextColor(Color::srgb(0.9, 0.9, 0.9)),
-                        //         TextShadow::default(),
-                        //     )],
-                        // ));
                         p.spawn((
                             CosmosButton {
                                 button_styles: Some(ButtonStyles {
@@ -77,9 +51,9 @@ fn toggle_pause(
                                     ..Default::default()
                                 }),
                                 text: Some((
-                                    "LEVEL SELECT".into(),
+                                    LEVEL_SELECT.into(),
                                     TextFont {
-                                        font: asset_server.load("ui_elements/ARCADECLASSIC.ttf"),
+                                        font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
                                         font_size: 33.0,
                                         ..default()
                                     },
@@ -88,26 +62,16 @@ fn toggle_pause(
                                 ..Default::default()
                             },
                             Node {
-                                border: UiRect::all(Val::Px(2.0)),
+                                border: UiRect::all(Val::Px(3.0)),
                                 margin: UiRect::all(Val::Percent(10.0)),
                                 width: Val::Auto,
                                 height: Val::Px(30.0),
                                 padding: UiRect::all(Val::Px(5.0)),
                                 ..Default::default()
                             },
-                            BorderColor::all(css::WHITE),
+                            BorderColor::all(css::BLACK),
                         ))
                         .observe(|trigger: On<ButtonMessage>| {});
-                        // p.spawn((
-                        //     Button,
-                        //     Node {
-                        //         margin: UiRect::all(Val::Percent(10.0)),
-                        //         width: Val::Auto,
-                        //         height: Val::Px(20.0),
-                        //         ..Default::default()
-                        //     },
-                        //     ImageNode::new(asset_server.load("ui_elements/retry.png")),
-                        // ));
                     });
             }
             GameState::Paused => {
