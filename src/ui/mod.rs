@@ -1,4 +1,6 @@
-use bevy::{color::palettes::css, prelude::*};
+use bevy::{color::palettes::css, log::tracing_subscriber::fmt::writer::WithMinLevel, prelude::*};
+
+use crate::levels::Level;
 
 pub const UI_HEIGHT: f32 = 200.0;
 
@@ -12,7 +14,45 @@ pub struct UIBad {
     pub bad_attributes: Vec<BadAttributes>,
 }
 
-fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Res<UIBad>) {
+fn create_ui(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    bad_box_rules: Res<UIBad>,
+    level: Res<Level>,
+) {
+    commands
+        .spawn((Node {
+            top: Val::Px(0.0),
+            width: Val::Percent(100.0),
+            height: Val::Px(100.0),
+            position_type: PositionType::Absolute,
+            flex_direction: FlexDirection::Row,
+            padding: UiRect::all(Val::Px(20.0)),
+            ..Default::default()
+        },))
+        .with_children(|p| {
+            p.spawn((
+                Node {
+                    margin: UiRect::horizontal(Val::Px(5.0)),
+                    width: Val::Px(100.0),
+                    height: Val::Px(20.0),
+                    ..Default::default()
+                },
+                ImageNode::new(asset_server.load("ui_elements/level.png")),
+            ));
+
+            let level_num = (*level as i16) + 1;
+            p.spawn((
+                Node {
+                    margin: UiRect::horizontal(Val::Px(5.0)),
+                    width: Val::Px(20.0),
+                    height: Val::Px(20.0),
+                    ..Default::default()
+                },
+                ImageNode::new(asset_server.load(format!("ui_elements/{level_num}.png"))),
+            ));
+        });
+
     commands
         .spawn((
             Node {
@@ -37,7 +77,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
                 ImageNode::new(asset_server.load("ui_elements/X.png")),
             ));
 
-            for bad_item in bad_box.bad_attributes.iter() {
+            for bad_item in bad_box_rules.bad_attributes.iter() {
                 match bad_item {
                     BadAttributes::Symbol(symbol) => {
                         p.spawn((
