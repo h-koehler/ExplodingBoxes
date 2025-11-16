@@ -484,5 +484,8 @@ fn spiral(commands: &mut Commands, asset_server: &AssetServer) {
 
 pub(super) fn register(app: &mut App) {
     app.add_systems(Startup, (setup_room, load_sprites));
-    app.add_systems(Update, (animate_conveyors, move_thing_on_conveyor).run_if(in_state(GameState::Running));
+    app.add_systems(
+        Update,
+        (animate_conveyors, move_thing_on_conveyor).run_if(in_state(GameState::Running)),
+    );
 }

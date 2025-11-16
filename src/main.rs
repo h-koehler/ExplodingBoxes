@@ -6,13 +6,13 @@ use crate::{
     ui::UI_HEIGHT,
 };
 
+pub mod boss_cat;
 pub mod boxes;
 pub mod character_controls;
+pub mod custom_utils;
 pub mod levels;
 pub mod room;
 pub mod ui;
-pub mod custom_utils;
-pub mod boss_cat;
 
 fn main() {
     let mut app = App::new();
