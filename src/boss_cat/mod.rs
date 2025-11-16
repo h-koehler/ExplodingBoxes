@@ -60,6 +60,7 @@ fn boss_movement_system(
     q_player: Query<Entity, With<Character>>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    meow: Res<Meow>,
 ) {
     let dt = time.delta_secs();
     for (mut transform, mut state) in q.iter_mut() {
@@ -99,7 +100,7 @@ fn boss_movement_system(
                 let random_number: i32 = rng.random_range(20..=TALKING_RAND_MAX);
                 if random_number <= MEOW_RAND_VALUE {
                     commands.spawn((
-                        AudioPlayer::new(asset_server.load("sounds/meow.ogg")),
+                        AudioPlayer::new(meow.0.clone()),
                         PlaybackSettings {
                             volume: Volume::Linear(random_number as f32 / MEOW_RAND_VALUE as f32),
                             ..Default::default()
@@ -107,7 +108,7 @@ fn boss_movement_system(
                     ));
                 } else if random_number >= EXIT_RAND_VALUE {
                     commands.spawn((
-                        AudioPlayer::new(asset_server.load("sounds/meow.ogg")),
+                        AudioPlayer::new(meow.0.clone()),
                         PlaybackSettings {
                             volume: Volume::Linear(1.0),
                             ..Default::default()
@@ -196,7 +197,15 @@ fn boss_delay_spawn_system(
     }
 }
 
+#[derive(Resource)]
+struct Meow(Handle<AudioSource>);
+
+fn load_sound(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(Meow(asset_server.load("sounds/meow.ogg")));
+}
+
 pub(super) fn register(app: &mut App) {
+    app.add_systems(Startup, load_sound);
     app.add_systems(PostUpdate, boss_spawning_system);
     app.add_systems(Update, boss_delay_spawn_system.before(boss_movement_system));
     app.add_systems(Update, boss_movement_system);
