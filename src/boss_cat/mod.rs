@@ -74,7 +74,9 @@ fn boss_movement_system(
 
                 transform.translation.x += x_dir * BOSS_SPEED * dt;
 
-                if transform.translation.y <= *target_y + 1.0 && transform.translation.x <= *target_x + 1.0 {
+                if transform.translation.y <= *target_y + 1.0
+                    && transform.translation.x <= *target_x + 1.0
+                {
                     transform.translation.y = *target_y;
                     transform.translation.x = *target_x;
                     *state = BossState::Talking;
@@ -113,7 +115,6 @@ fn boss_delay_spawn_system(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
     delay: Option<ResMut<Delay>>,
-    mut next_state: ResMut<NextState<GameState>>,
     q_player: Query<(Entity, &Transform), With<Character>>,
 ) {
     let Some(mut delay) = delay else { return };
@@ -122,7 +123,6 @@ fn boss_delay_spawn_system(
 
     if delay.0.is_finished() {
         commands.remove_resource::<Delay>();
-        next_state.set(GameState::BossCatTime);
 
         let (player_entity, player_transform) = match q_player.single() {
             Ok(t) => t,
@@ -143,7 +143,7 @@ fn boss_delay_spawn_system(
         // let top_quarter_min = ROOM_HEIGHT as f32 * TOP_QUARTER_MIN_Y_FACTOR;
         let target_x = player_pos.x + 80.0;
         let target_y = player_pos.y;
-        
+
         commands.spawn((
             BossCat,
             Movable,
@@ -156,9 +156,7 @@ fn boss_delay_spawn_system(
             Transform::from_translation(Vec3::new(spawn_x, spawn_y, 5.0)),
         ));
 
-        commands
-            .entity(player_entity)
-            .insert(Velocity::default());
+        commands.entity(player_entity).insert(Velocity::default());
     }
 }
 
