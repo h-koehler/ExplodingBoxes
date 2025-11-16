@@ -1,7 +1,7 @@
 use bevy::{color::palettes::css, prelude::*};
 
 use crate::{
-    boxes::spawn::{SpawnItem, SpawnList},
+    boxes::spawn::{BoxAddOns, SpawnItem, SpawnList},
     ui::{BadAttributes, UIBad},
 };
 
@@ -35,17 +35,21 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
         Level::One => {
             commands.insert_resource(SpawnList {
                 entries: vec![
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Bad(vec![("simple", css::RED)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Bad(vec![("simple", css::RED)]),
-                    SpawnItem::Bad(vec![("simple", css::RED)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
-                    SpawnItem::Good(vec![("simple", css::GREEN)]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![(
+                        "simple",
+                        css::GREEN,
+                        BoxAddOns::new("circle".into()),
+                    )]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
                 ],
             });
             commands.insert_resource(UIBad {
