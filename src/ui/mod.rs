@@ -196,7 +196,7 @@ pub(super) fn register(app: &mut App) {
     loss::register(app);
     win::register(app);
     app.add_systems(
-        Update,
+        PostUpdate,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),
     );
 }
