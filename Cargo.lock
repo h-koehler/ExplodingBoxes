@@ -3,15 +3,6 @@
 version = 4
 
 [[package]]
-name = "ExplodingBoxes"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "rand",
- "walkdir",
-]
-
-[[package]]
 name = "ab_glyph"
 version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1686,6 +1677,15 @@ dependencies = [
  "rustix 0.38.44",
  "wayland-backend",
  "wayland-client",
+]
+
+[[package]]
+name = "cat_tsa"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "rand",
+ "walkdir",
 ]
 
 [[package]]
