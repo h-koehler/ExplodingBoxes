@@ -4,6 +4,7 @@ use crate::levels::Level;
 
 pub mod button;
 pub mod loss;
+pub mod win;
 
 pub const UI_HEIGHT: f32 = 200.0;
 pub const LEVEL: &str = "LEVEL";
@@ -178,6 +179,7 @@ fn create_ui(
 pub(super) fn register(app: &mut App) {
     button::register(app);
     loss::register(app);
+    win::register(app);
     app.add_systems(
         Update,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),

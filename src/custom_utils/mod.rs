@@ -11,6 +11,7 @@ pub enum GameState {
     Paused,
     BossCatTime,
     Loss,
+    Win,
 }
 
 #[derive(Component)]
@@ -81,7 +82,7 @@ fn toggle_pause(
                     commands.entity(pause_ent).despawn();
                 }
             }
-            GameState::BossCatTime | GameState::Loss => {}
+            GameState::BossCatTime | GameState::Loss | GameState::Win => {}
         }
     }
 }
