@@ -1,8 +1,4 @@
-use bevy::prelude::*;
-
-use crate::levels::Level;
-
-pub mod button;
+use bevy::{color::palettes::css, prelude::*};
 
 pub mod button;
 
@@ -18,31 +14,7 @@ pub struct UIBad {
     pub bad_attributes: Vec<BadAttributes>,
 }
 
-#[derive(Component)]
-pub struct Button;
-
-#[derive(Component)]
-pub struct UILevel;
-
-#[derive(Component)]
-pub struct UIBadItem;
-
-fn create_ui(
-    mut commands: Commands,
-    q_level: Query<Entity, With<UILevel>>,
-    q_bad_item: Query<Entity, With<UIBadItem>>,
-    asset_server: Res<AssetServer>,
-    bad_box_rules: Res<UIBad>,
-    level: Res<Level>,
-) {
-    if let Ok(level_ent) = q_level.single() {
-        commands.entity(level_ent).despawn();
-    }
-
-    for bad_item in q_bad_item.iter() {
-        commands.entity(bad_item).despawn();
-    }
-
+fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Res<UIBad>) {
     commands
         .spawn((Node {
             top: Val::Px(0.0),
@@ -63,17 +35,16 @@ fn create_ui(
                 },
                 ImageNode::new(asset_server.load("ui_elements/level.png")),
             ));
-
-            let level_num = (*level as i16) + 1;
+        })
+        .with_children(|p| {
             p.spawn((
-                UILevel,
                 Node {
                     margin: UiRect::horizontal(Val::Px(5.0)),
                     width: Val::Px(20.0),
                     height: Val::Px(20.0),
                     ..Default::default()
                 },
-                ImageNode::new(asset_server.load(format!("ui_elements/{level_num}.png"))),
+                ImageNode::new(asset_server.load("ui_elements/1.png")),
             ));
         });
 
@@ -101,11 +72,10 @@ fn create_ui(
                 ImageNode::new(asset_server.load("ui_elements/X.png")),
             ));
 
-            for bad_item in bad_box_rules.bad_attributes.iter() {
+            for bad_item in bad_box.bad_attributes.iter() {
                 match bad_item {
                     BadAttributes::Symbol(symbol) => {
                         p.spawn((
-                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),
@@ -117,7 +87,6 @@ fn create_ui(
                     }
                     BadAttributes::Color(color) => {
                         p.spawn((
-                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),
@@ -135,10 +104,6 @@ fn create_ui(
 
 pub(super) fn register(app: &mut App) {
     button::register(app);
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/corn
     app.add_systems(
         Update,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),
