@@ -177,7 +177,7 @@ fn create_ui(
                         Name::new("TEXT!"),
                         Text::new(text),
                         TextFont {
-                            font_size: 28.0,
+                            font_size: 20.0,
                             font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },

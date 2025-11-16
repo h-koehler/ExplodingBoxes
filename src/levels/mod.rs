@@ -242,7 +242,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Fear the fourth of every square!".into()],
+                additional_text: vec![
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right".into(),
+                ],
                 // "how many sides does a square have?"
             });
         }
@@ -340,7 +343,11 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Circles like to follow the leader...".into()],
+                additional_text: vec![
+                    "Circles like to follow the leader...".into(),
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right".into(),
+                ],
             });
         }
         Level::Five => {
@@ -414,6 +421,9 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                 ],
                 additional_text: vec![
                     "Plus signs are copycats! Pay attention to their leader.".into(),
+                    "Circles like to follow the leader...".into(),
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right".into(),
                 ],
             });
         }
