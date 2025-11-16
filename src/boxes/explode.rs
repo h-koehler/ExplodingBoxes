@@ -26,10 +26,7 @@ fn box_swatted(
         let y = bad_box_transform.translation.y;
         if x < min_x || x > max_x || y < min_y || y > max_y {
             if bad_box {
-                let mut rng = rand::rng();
-                let random_number: i32 = rng.random_range(1..=3);
-                let sound_file_name = format!("sounds/explosion_{}.ogg", random_number);
-                commands.spawn(AudioPlayer::new(asset_server.load(sound_file_name)));
+                commands.spawn(AudioPlayer::new(asset_server.load("sounds/explosion.ogg")));
             } else if good_box {
                 commands.spawn((
                     AudioPlayer::new(asset_server.load("sounds/glass_shatter.ogg")),
