@@ -158,7 +158,7 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                         "simple",
                         css::GREEN,
                         BoxAddOns::new("square".into()),
-                    )]), // 2
+                    )]), // 3
                     SpawnItem::Bad(vec![(
                         "simple",
                         css::GREY,
@@ -170,7 +170,7 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                         BoxAddOns::new("triangle".into()),
                     )]),
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
-                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 1
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 2
                     SpawnItem::Bad(vec![(
                         "simple",
                         css::GREEN,
