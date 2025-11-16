@@ -7,6 +7,7 @@ use crate::{
     boxes::spawn::{SpawnItem, SpawnList},
     character_controls::{Velocity, swat::Swatted},
     room::{BoxGoal, BoxSpawner, CONVEYOR_SIZE, Movable},
+    custom_utils::GameState,
 };
 
 pub mod explode;
@@ -76,6 +77,12 @@ pub enum BoxMadeIt {
     BadBox,
 }
 
+#[derive(Message)]
+pub enum BoxKicked {
+    GoodBox,
+    BadBox,
+}
+
 fn kill_box(
     mut commands: Commands,
     q_box: Query<(Entity, &Transform, Has<GoodBox>), (With<GameBox>, Without<Swatted>)>,
@@ -111,9 +118,10 @@ pub(super) fn register(app: &mut App) {
         (
             spawn_box.run_if(on_timer(Duration::from_secs_f32(
                 SECONDS_BETWEEN_BOX_SPAWNS,
-            ))),
-            kill_box,
+            ))).run_if(in_state(GameState::Running)),
+            kill_box.run_if(in_state(GameState::Running)),
         ),
     )
-    .add_message::<BoxMadeIt>();
+    .add_message::<BoxMadeIt>()
+    .add_message::<BoxKicked>();
 }
