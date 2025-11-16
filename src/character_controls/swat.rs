@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::{
-    boxes::GameBox,
-    character_controls::{Character, Velocity},
+    boxes::{BoxKicked, GameBox, GoodBox},
+    character_controls::{Character, Velocity}, custom_utils::GameState,
 };
 
 #[derive(Component)]
@@ -12,14 +12,18 @@ const SWAT_VEL: f32 = 1000.0;
 
 fn on_swat(
     q_player: Query<&Transform, With<Character>>,
-    mut q_swatted: Query<(&mut Velocity, &Transform), Added<Swatted>>,
+    mut q_swatted: Query<(&mut Velocity, &Transform, Has<GoodBox>), Added<Swatted>>,
+    mut message_writer: MessageWriter<BoxKicked>,
 ) {
-    for (mut vel, swatted_trans) in q_swatted.iter_mut() {
+    for (mut vel, swatted_trans, is_good) in q_swatted.iter_mut() {
         let player = q_player.single().expect("no player trans");
         vel.linear_velocity += (swatted_trans.translation - player.translation)
             .normalize_or(Vec3::Y)
             .xy()
             * SWAT_VEL;
+        message_writer.write(if is_good {BoxKicked::GoodBox} else {
+            BoxKicked::BadBox
+        });
     }
 }
 
@@ -70,5 +74,5 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, (find_near_box, swat, on_swat).chain());
+    app.add_systems(Update, (find_near_box, swat, on_swat).run_if(in_state(GameState::Running)).chain());
 }

@@ -1,6 +1,5 @@
 use crate::{
-    room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
-    ui::UI_HEIGHT,
+    custom_utils::GameState, room::{Movable, ROOM_HEIGHT, ROOM_WIDTH}, ui::UI_HEIGHT
 };
 use bevy::prelude::*;
 
@@ -119,6 +118,6 @@ pub(super) fn register(app: &mut App) {
     swat::register(app);
 
     app.add_systems(Startup, (setup, load_profiles));
-    app.add_systems(Update, player_input);
-    app.add_systems(PostUpdate, apply_velocity);
+    app.add_systems(Update, player_input.run_if(in_state(GameState::Running)));
+    app.add_systems(PostUpdate, apply_velocity.run_if(in_state(GameState::Running)));
 }

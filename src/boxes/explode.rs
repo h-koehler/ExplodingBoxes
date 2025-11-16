@@ -1,18 +1,88 @@
 use bevy::prelude::*;
 
-use crate::room::ROOM_HEIGHT;
+use rand::Rng;
 
-fn spawn_explosive_decal(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((
-        Sprite {
-            image: asset_server.load("explosion_residue.png"),
-            custom_size: Some(Vec2::new(1000.0, 300.0)),
-            ..Default::default()
-        },
-        Transform::from_translation(Vec3::new(0.0, ROOM_HEIGHT as f32 / 2.0 - 150.0, -1.0)),
-    ));
+use crate::{
+    boxes::{BadBox, BoxMadeIt, GameBox, GoodBox},
+    room::{ROOM_HEIGHT, ROOM_WIDTH},
+};
+
+#[derive(Component)]
+pub struct DespawnTimer(pub Timer);
+
+fn box_swatted(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    q_box: Query<(&Transform, Entity, Has<GoodBox>, Has<BadBox>), With<GameBox>>,
+) {
+    // Doubled to delay sound effects and avoid despawning boxes on the screen.
+    let min_x = -(ROOM_WIDTH as f32);
+    let max_x = ROOM_WIDTH as f32;
+    let min_y = -(ROOM_HEIGHT as f32);
+    let max_y = ROOM_HEIGHT as f32;
+    for (bad_box_transform, bad_box_entity, good_box, bad_box) in q_box.iter() {
+        let x = bad_box_transform.translation.x;
+        let y = bad_box_transform.translation.y;
+        if x < min_x || x > max_x || y < min_y || y > max_y {
+            if bad_box {
+                let mut rng = rand::rng();
+                let random_number: i32 = rng.random_range(1..=3);
+                let sound_file_name = format!("sounds/explosion_{}.ogg", random_number);
+                commands.spawn(AudioPlayer::new(asset_server.load(sound_file_name)));
+            } else if good_box {
+                commands.spawn(AudioPlayer::new(
+                    asset_server.load("sounds/glass_shatter.ogg"),
+                ));
+            }
+            commands.entity(bad_box_entity).despawn();
+        }
+    }
+}
+
+fn box_made_it_event(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut evr_box_made_it: MessageReader<BoxMadeIt>,
+) {
+    for box_made_it in evr_box_made_it.read() {
+        match box_made_it {
+            BoxMadeIt::BadBox => {
+                let mut rng = rand::rng();
+                let random_number: i32 = rng.random_range(1..=3);
+                let file_name = format!("bad_cat_{}.png", random_number);
+                commands.spawn((
+                    Sprite {
+                        image: asset_server.load(file_name),
+                        custom_size: Some(Vec2::new(ROOM_WIDTH as f32, ROOM_HEIGHT as f32)),
+                        ..Default::default()
+                    },
+                    Transform::from_xyz(0.0, 0.0, 100.0),
+                    DespawnTimer(Timer::from_seconds(1.0, TimerMode::Once)),
+                ));
+                commands.spawn(AudioPlayer::new(
+                    asset_server.load("sounds/explosion_large.ogg"),
+                ));
+            }
+            BoxMadeIt::GoodBox => {
+                commands.spawn(AudioPlayer::new(asset_server.load("sounds/beep.ogg")));
+            }
+        }
+    }
+}
+
+fn despawn_after_time(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut DespawnTimer)>,
+) {
+    for (entity, mut despawn_timer) in query.iter_mut() {
+        despawn_timer.0.tick(time.delta());
+        if despawn_timer.0.is_finished() {
+            commands.entity(entity).despawn();
+        }
+    }
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Startup, spawn_explosive_decal);
+    app.add_systems(Update, (box_swatted, box_made_it_event, despawn_after_time));
 }
