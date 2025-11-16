@@ -54,39 +54,6 @@ fn create_ui(
         });
 
     commands
-        .spawn((Node {
-            top: Val::Px(0.0),
-            width: Val::Percent(100.0),
-            height: Val::Px(100.0),
-            position_type: PositionType::Absolute,
-            flex_direction: FlexDirection::Row,
-            padding: UiRect::all(Val::Px(20.0)),
-            ..Default::default()
-        },))
-        .with_children(|p| {
-            p.spawn((
-                Node {
-                    margin: UiRect::horizontal(Val::Px(5.0)),
-                    width: Val::Px(100.0),
-                    height: Val::Px(20.0),
-                    ..Default::default()
-                },
-                ImageNode::new(asset_server.load("ui_elements/level.png")),
-            ));
-        })
-        .with_children(|p| {
-            p.spawn((
-                Node {
-                    margin: UiRect::horizontal(Val::Px(5.0)),
-                    width: Val::Px(20.0),
-                    height: Val::Px(20.0),
-                    ..Default::default()
-                },
-                ImageNode::new(asset_server.load("ui_elements/1.png")),
-            ));
-        });
-
-    commands
         .spawn((
             Node {
                 bottom: Val::Px(0.0),
