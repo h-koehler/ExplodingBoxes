@@ -27,7 +27,7 @@ impl Level {
             Self::Five => return true,
         };
 
-        false
+        true
     }
 }
 
@@ -61,7 +61,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
             });
             commands.insert_resource(UIBad {
                 bad_attributes: vec![BadAttributes::Color(css::RED)],
-                additional_text: vec!["Press SPACE to swat all explosive boxes!".into()],
+                additional_text: vec![
+                    "Press SPACE to swat all explosive boxes!".into(),
+                    "See Left Guide for Explosive Box Types".into(),
+                ],
             });
         }
         Level::Two => {
