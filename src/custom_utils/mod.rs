@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum GameState {
@@ -38,23 +38,63 @@ fn toggle_pause(
                     ))
                     .with_children(|p| {
                         p.spawn((
+                            Button,
                             Node {
-                                margin: UiRect::all(Val::Percent(10.0)),
-                                width: Val::Auto,
-                                height: Val::Px(20.0),
-                                ..Default::default()
+                                width: px(150),
+                                height: px(65),
+                                border: UiRect::all(px(5)),
+                                // horizontally center child text
+                                justify_content: JustifyContent::Center,
+                                // vertically center child text
+                                align_items: AlignItems::Center,
+                                ..default()
                             },
-                            ImageNode::new(asset_server.load("ui_elements/level_select.png")),
+                            BorderColor::all(Color::WHITE),
+                            BorderRadius::MAX,
+                            BackgroundColor(Color::BLACK),
+                            children![(
+                                Text::new("Button"),
+                                TextFont {
+                                    font: asset_server.load("ui_elements/FiraSans-Bold.ttf"),
+                                    font_size: 33.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.9, 0.9, 0.9)),
+                                TextShadow::default(),
+                            )],
                         ));
                         p.spawn((
+                            Button,
                             Node {
                                 margin: UiRect::all(Val::Percent(10.0)),
                                 width: Val::Auto,
                                 height: Val::Px(20.0),
                                 ..Default::default()
                             },
-                            ImageNode::new(asset_server.load("ui_elements/retry.png")),
+                            BorderColor::all(css::BLACK),
+                            BorderRadius::all(Val::Px(5.0)),
+                            ImageNode::new(asset_server.load("ui_elements/level_select.png")),
+                            children![(
+                                Text::new("Button"),
+                                TextFont {
+                                    font: asset_server.load("ui_elements/FiraSans-Bold.ttf"),
+                                    font_size: 33.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.9, 0.9, 0.9)),
+                                TextShadow::default(),
+                            )],
                         ));
+                        // p.spawn((
+                        //     Button,
+                        //     Node {
+                        //         margin: UiRect::all(Val::Percent(10.0)),
+                        //         width: Val::Auto,
+                        //         height: Val::Px(20.0),
+                        //         ..Default::default()
+                        //     },
+                        //     ImageNode::new(asset_server.load("ui_elements/retry.png")),
+                        // ));
                     });
             }
             GameState::Paused => {

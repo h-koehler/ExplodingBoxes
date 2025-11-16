@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::levels::Level;
 
+pub mod button;
+
 pub const UI_HEIGHT: f32 = 200.0;
 
 pub enum BadAttributes {
@@ -130,6 +132,8 @@ fn create_ui(
 }
 
 pub(super) fn register(app: &mut App) {
+    button::register(app);
+
     app.add_systems(
         Update,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),
