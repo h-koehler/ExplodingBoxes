@@ -31,13 +31,20 @@ fn on_swat(
     }
 }
 
+#[derive(Resource)]
+struct Belt(Handle<AudioSource>);
+
+fn load_belt_sound(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(Belt(asset_server.load("sounds/belt.ogg")));
+}
+
 fn boss_swat(
     mut q_player_velocity: Query<&mut Velocity, Added<DidBadSwat>>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    belt: Res<Belt>,
 ) {
     for mut vel in q_player_velocity.iter_mut() {
-        commands.spawn(AudioPlayer::new(asset_server.load("sounds/belt.ogg")));
+        commands.spawn(AudioPlayer::new(belt.0.clone()));
 
         vel.linear_velocity.x = SWAT_VEL;
         vel.linear_velocity.y = SWAT_VEL;
@@ -94,6 +101,8 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
+    app.add_systems(Startup, load_belt_sound);
+
     app.add_systems(
         Update,
         (
