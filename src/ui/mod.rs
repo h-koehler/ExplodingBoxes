@@ -161,13 +161,13 @@ fn create_ui(
                         Name::new("TEXT!"),
                         Text::new("NEW INSTRUCTIONS"),
                         TextFont {
-                            font_size: 40.0,
+                            font_size: 30.0,
                             font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },
                         TextColor(css::RED.into()),
                         Node {
-                            margin: UiRect::all(Val::Px(5.0)),
+                            margin: UiRect::all(Val::Px(1.0)),
                             ..Default::default()
                         },
                     ));
@@ -177,12 +177,12 @@ fn create_ui(
                         Name::new("TEXT!"),
                         Text::new(text),
                         TextFont {
-                            font_size: 20.0,
+                            font_size: 22.0,
                             font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },
                         Node {
-                            margin: UiRect::all(Val::Px(5.0)),
+                            margin: UiRect::all(Val::Px(3.0)),
                             ..Default::default()
                         },
                     ));
