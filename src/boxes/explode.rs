@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{audio::Volume, prelude::*};
 
 use rand::Rng;
@@ -5,9 +7,11 @@ use rand::Rng;
 use crate::{
     boss_cat::Delay,
     boxes::{BadBox, BoxMadeIt, GameBox, GoodBox},
+    character_controls::camera_shake::CameraShake,
     character_controls::{Character, Velocity},
     custom_utils::GameState,
     room::{ROOM_HEIGHT, ROOM_WIDTH},
+    ui::loss::LossReason,
 };
 
 #[derive(Component)]
@@ -17,6 +21,7 @@ fn box_swatted(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     q_box: Query<(&Transform, Entity, Has<GoodBox>, Has<BadBox>), With<GameBox>>,
+    q_camera: Query<Entity, With<Camera2d>>,
     mut next_state: ResMut<NextState<GameState>>,
     q_player: Query<Entity, With<Character>>,
 ) {
@@ -31,6 +36,11 @@ fn box_swatted(
         if x < min_x || x > max_x || y < min_y || y > max_y {
             if bad_box {
                 commands.spawn(AudioPlayer::new(asset_server.load("sounds/explosion.ogg")));
+                if let Ok(cam_ent) = q_camera.single() {
+                    commands
+                        .entity(cam_ent)
+                        .insert(CameraShake::new(Duration::from_millis(500), 5.0));
+                }
             } else if good_box {
                 commands.spawn((
                     AudioPlayer::new(asset_server.load("sounds/glass_shatter.ogg")),
@@ -40,6 +50,7 @@ fn box_swatted(
                     },
                 ));
                 commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+                commands.insert_resource(LossReason::BadKick);
                 next_state.set(GameState::BossCatTime);
                 commands
                     .entity(q_player.single().expect("no player ;("))
@@ -75,6 +86,7 @@ fn box_made_it_event(
                     },
                     DespawnTimer(Timer::from_seconds(1.0, TimerMode::Once)),
                 ));
+                commands.insert_resource(LossReason::BadLetThrough);
                 commands.spawn((
                     AudioPlayer::new(asset_server.load("sounds/explosion_large.ogg")),
                     PlaybackSettings {

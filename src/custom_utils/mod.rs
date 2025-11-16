@@ -10,6 +10,8 @@ pub enum GameState {
     Running,
     Paused,
     BossCatTime,
+    Loss,
+    Win,
 }
 
 #[derive(Component)]
@@ -53,7 +55,7 @@ fn toggle_pause(
                                 text: Some((
                                     LEVEL_SELECT.into(),
                                     TextFont {
-                                        font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                                        font: asset_server.load("fonts/default.ttf"),
                                         font_size: 33.0,
                                         ..default()
                                     },
@@ -80,7 +82,7 @@ fn toggle_pause(
                     commands.entity(pause_ent).despawn();
                 }
             }
-            GameState::BossCatTime => next_state.set(GameState::Paused),
+            GameState::BossCatTime | GameState::Loss | GameState::Win => {}
         }
     }
 }
