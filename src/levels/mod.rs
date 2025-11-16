@@ -28,6 +28,21 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                 SpawnItem::Good(vec![("simple", css::GREEN)]),
             ],
         }),
+        Level::Two => commands.insert_resource(SpawnList {
+            entries: vec![
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Bad(vec![("simple", css::RED)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+                SpawnItem::Good(vec![("simple", css::GREEN)]),
+            ],
+        }),
         _ => todo!(),
     }
 }
