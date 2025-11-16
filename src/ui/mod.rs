@@ -15,6 +15,9 @@ pub struct UIBad {
 }
 
 #[derive(Component)]
+pub struct Button;
+
+#[derive(Component)]
 pub struct UILevel;
 
 #[derive(Component)]

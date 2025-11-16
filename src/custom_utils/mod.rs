@@ -23,16 +23,39 @@ fn toggle_pause(
         match state.get() {
             GameState::Running => {
                 next_state.set(GameState::Paused);
-                commands.spawn((
-                    PauseMenu,
-                    Node {
-                        margin: UiRect::all(Val::Auto),
-                        width: Val::Px(600.0),
-                        height: Val::Px(600.0),
-                        ..Default::default()
-                    },
-                    ImageNode::new(asset_server.load("ui_elements/pause_menu.png")),
-                ));
+                commands
+                    .spawn((
+                        PauseMenu,
+                        Node {
+                            margin: UiRect::all(Val::Auto),
+                            width: Val::Px(600.0),
+                            height: Val::Px(600.0),
+                            flex_direction: FlexDirection::Row,
+                            align_items: AlignItems::End,
+                            ..Default::default()
+                        },
+                        ImageNode::new(asset_server.load("ui_elements/pause_menu.png")),
+                    ))
+                    .with_children(|p| {
+                        p.spawn((
+                            Node {
+                                margin: UiRect::all(Val::Percent(10.0)),
+                                width: Val::Auto,
+                                height: Val::Px(20.0),
+                                ..Default::default()
+                            },
+                            ImageNode::new(asset_server.load("ui_elements/level_select.png")),
+                        ));
+                        p.spawn((
+                            Node {
+                                margin: UiRect::all(Val::Percent(10.0)),
+                                width: Val::Auto,
+                                height: Val::Px(20.0),
+                                ..Default::default()
+                            },
+                            ImageNode::new(asset_server.load("ui_elements/retry.png")),
+                        ));
+                    });
             }
             GameState::Paused => {
                 next_state.set(GameState::Running);
