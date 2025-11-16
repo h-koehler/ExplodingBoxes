@@ -69,12 +69,12 @@ fn boss_movement_system(
                 } else if transform.translation.x < *target_x {
                     1.0
                 } else {
-                    1.0
+                    0.0
                 };
 
                 transform.translation.x += x_dir * BOSS_SPEED * dt;
 
-                if transform.translation.y <= *target_y + 1.0 && transform.translation.y >= *target_x {
+                if transform.translation.y <= *target_y + 1.0 && transform.translation.x <= *target_x + 1.0 {
                     transform.translation.y = *target_y;
                     transform.translation.x = *target_x;
                     *state = BossState::Talking;
