@@ -61,7 +61,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
             });
             commands.insert_resource(UIBad {
                 bad_attributes: vec![BadAttributes::Color(css::RED)],
-                additional_text: vec![],
+                additional_text: vec![
+                    "Press SPACE to swat all explosive boxes!".into(),
+                    "See Left Guide for Explosive Box Types".into(),
+                ],
             });
         }
         Level::Two => {
@@ -148,7 +151,7 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Two Wrongs Make a Right".into()],
+                additional_text: vec!["Two Wrongs Make a Right!".into()],
             });
         }
         Level::Three => {
@@ -239,7 +242,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Fear the fourth of every square!".into()],
+                additional_text: vec![
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right!".into(),
+                ],
                 // "how many sides does a square have?"
             });
         }
@@ -337,7 +343,11 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Circles like to follow the leader...".into()],
+                additional_text: vec![
+                    "Circles copy the result of their leader!".into(),
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right!".into(),
+                ],
             });
         }
         Level::Five => {
@@ -410,7 +420,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Symbol("triangle".into()),
                 ],
                 additional_text: vec![
-                    "Plus signs are copycats! Pay attention to their leader.".into(),
+                    "Plus signs copy the behavior of their leader!".into(),
+                    "Circles copy the result of their leader!".into(),
+                    "Fear the fourth of every square!".into(),
+                    "Two Wrongs Make a Right!".into(),
                 ],
             });
         }
@@ -419,7 +432,6 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
 
 pub(super) fn register(app: &mut App) {
     advance::register(app);
-    // level_select::register(app);
 
     app.add_systems(Update, setup_level.run_if(resource_changed::<Level>))
         .insert_resource(Level::One);

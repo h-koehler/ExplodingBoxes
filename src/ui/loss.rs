@@ -118,7 +118,7 @@ fn show_loss(
                         commands.entity(b).despawn();
                     }
 
-                    *level = Level::One;
+                    level.set_changed();
                     commands
                         .entity(q_character.single().unwrap())
                         .insert((
