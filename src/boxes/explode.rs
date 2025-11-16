@@ -57,7 +57,7 @@ fn box_made_it_event(
                         ..Default::default()
                     },
                     Transform::from_xyz(0.0, 0.0, 100.0),
-                    DespawnTimer(Timer::from_seconds(1.0, TimerMode::Once)),
+                    DespawnTimer(Timer::from_seconds(0.8, TimerMode::Once)),
                 ));
                 commands.spawn(AudioPlayer::new(
                     asset_server.load("sounds/explosion_large.ogg"),
