@@ -43,7 +43,7 @@ fn spawn_box(
                 SpawnItem::Good(files) => {
                     let (path, color, addons) = files.choose(&mut rand::rng()).unwrap();
 
-                    for (addon) in addons.addons.iter() {
+                    for addon in addons.addons.iter() {
                         ecmds.with_child((
                             Sprite {
                                 image: asset_server.load(format!("addons/{addon}.png")),

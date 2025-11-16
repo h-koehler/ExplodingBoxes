@@ -12,13 +12,12 @@ pub struct Swatted;
 const SWAT_VEL: f32 = 1000.0;
 
 fn on_swat(
-    q_player: Query<(Entity, &Transform), With<Character>>,
+    q_player: Query<&Transform, With<Character>>,
     mut q_swatted: Query<(&mut Velocity, &Transform, Has<GoodBox>), Added<Swatted>>,
     mut message_writer: MessageWriter<BoxKicked>,
-    mut commands: Commands,
 ) {
     for (mut vel, swatted_trans, is_good) in q_swatted.iter_mut() {
-        let (player_entity, player_transform) = q_player.single().expect("no player trans");
+        let player_transform = q_player.single().expect("no player trans");
         vel.linear_velocity += (swatted_trans.translation - player_transform.translation)
             .normalize_or(Vec3::Y)
             .xy()
