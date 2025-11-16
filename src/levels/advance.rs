@@ -6,12 +6,22 @@ use crate::{
     ui::win::Win,
 };
 
+#[derive(Resource)]
+// evil hack
+pub struct JustReset;
+
 fn advance_level(
     q_box: Query<(), With<GameBox>>,
     spawn_boxes: Res<SpawnList>,
     mut level: ResMut<Level>,
     mut evw_win: MessageWriter<Win>,
+    just_reset: Option<Res<JustReset>>,
+    mut commands: Commands,
 ) {
+    commands.remove_resource::<JustReset>();
+    if just_reset.is_some() {
+        return;
+    }
     if !(spawn_boxes.entries.is_empty() && q_box.iter().next().is_none()) {
         return;
     }

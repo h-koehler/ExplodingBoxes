@@ -4,7 +4,7 @@ use crate::{
     boxes::GameBox,
     character_controls::{Character, Velocity, swat::DidBadSwat},
     custom_utils::GameState,
-    levels::Level,
+    levels::{Level, advance::JustReset},
     ui::button::{ButtonMessage, CosmosButton},
 };
 
@@ -107,6 +107,8 @@ fn show_win(
                     for e in q_loss_menu.iter() {
                         commands.entity(e).despawn();
                     }
+
+                    commands.insert_resource(JustReset);
 
                     state.set(GameState::Running);
                 },
