@@ -1,8 +1,11 @@
 use bevy::{color::palettes::css, prelude::*};
 
+use crate::levels::Level;
+
 pub mod button;
 
 pub const UI_HEIGHT: f32 = 200.0;
+pub const LEVEL: &str = "LEVEL";
 
 pub enum BadAttributes {
     Color(Srgba),
@@ -15,12 +18,18 @@ pub struct UIBad {
     pub additional_text: Vec<String>,
 }
 
-fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Res<UIBad>) {
+fn create_ui(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    bad_box: Res<UIBad>,
+    level: Res<Level>,
+) {
+    let level_num = (*level as i16) + 1;
     commands
         .spawn((Node {
             top: Val::Px(0.0),
             width: Val::Percent(100.0),
-            height: Val::Px(100.0),
+            height: Val::Px(60.0),
             position_type: PositionType::Absolute,
             flex_direction: FlexDirection::Row,
             padding: UiRect::all(Val::Px(20.0)),
@@ -28,24 +37,36 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
         },))
         .with_children(|p| {
             p.spawn((
+                Name::new("Level Text"),
                 Node {
-                    margin: UiRect::horizontal(Val::Px(5.0)),
-                    width: Val::Px(100.0),
-                    height: Val::Px(20.0),
                     ..Default::default()
                 },
-                ImageNode::new(asset_server.load("ui_elements/level.png")),
+            ))
+            .with_child((
+                Text::new(LEVEL),
+                TextFont {
+                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                    font_size: 33.0,
+                    ..default()
+                },
+                TextColor(Color::BLACK),
             ));
         })
         .with_children(|p| {
             p.spawn((
+                Name::new("Level Number Text"),
                 Node {
-                    margin: UiRect::horizontal(Val::Px(5.0)),
-                    width: Val::Px(20.0),
-                    height: Val::Px(20.0),
                     ..Default::default()
                 },
-                ImageNode::new(asset_server.load("ui_elements/1.png")),
+            ))
+            .with_child((
+                Text::new(level_num.to_string()),
+                TextFont {
+                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                    font_size: 33.0,
+                    ..default()
+                },
+                TextColor(Color::BLACK),
             ));
         });
 
@@ -122,7 +143,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
                         Text::new("NEW INSTRUCTIONS"),
                         TextFont {
                             font_size: 24.0,
-                            // font: asset_server.load("fonts/ARCADECLASSIC.TTF"),
+                            font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
                             ..Default::default()
                         },
                         TextColor(css::RED.into()),
