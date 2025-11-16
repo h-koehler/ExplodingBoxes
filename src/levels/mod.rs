@@ -32,7 +32,7 @@ impl Level {
 
 fn setup_level(mut commands: Commands, level: Res<Level>) {
     match *level {
-        Level::One => { // Bad: Red, Good: Green, Grey
+        Level::One => { // Bad: Red, Good: Green, Grey (20)
             commands.insert_resource(SpawnList {
                 entries: vec![
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
@@ -61,9 +61,12 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                 bad_attributes: vec![BadAttributes::Color(css::RED)],
             });
         }
-        Level::Two => { // Bad: RED, Green/Grey w/ Triangle, Good: Green, Grey, Red w/ Triangle
+        Level::Two => { // Introoduce triangles (25)
             commands.insert_resource(SpawnList {
                 entries: vec![
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
                     SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
@@ -76,6 +79,7 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
@@ -90,6 +94,41 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
             commands.insert_resource(UIBad {
                 bad_attributes: vec![BadAttributes::Color(css::RED), BadAttributes::Symbol("triangle".into())],
                 // add text that says "two wrongs make a right ;)"
+            });
+        }
+        Level::Three => { // Introoduce square - every 4th square is bad, regardless of color (25)
+            commands.insert_resource(SpawnList {
+                entries: vec![
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 2
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 1
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 1
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("square".into()))]), // 4 - BAD
+                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::new("square".into()))]), // 3
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 2
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 1
+                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::default())]),
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 4 - BAD 
+                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::new("square".into()))]), // 3
+                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 2
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 1
+                ],
+            });
+            commands.insert_resource(UIBad {
+                bad_attributes: vec![BadAttributes::Color(css::RED), BadAttributes::Symbol("square".into())],
+                // "how many sides does a square have?"
             });
         }
         _ => todo!(),
