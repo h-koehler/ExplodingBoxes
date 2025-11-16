@@ -19,7 +19,7 @@ const EXIT_RAND_VALUE: i32 = 50;
 #[derive(Component)]
 pub struct BossCat;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 enum BossState {
     Entering { target_y: f32, target_x: f32 },
     Talking,
@@ -38,6 +38,7 @@ fn boss_spawning_system(
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
             commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+            commands.insert_resource(LossReason::BadKick);
         }
     }
 
@@ -95,7 +96,7 @@ fn boss_movement_system(
             BossState::Talking => {
                 // boss stands still, asserting his dominance
                 let mut rng = rand::rng();
-                let random_number: i32 = rng.random_range(1..=TALKING_RAND_MAX);
+                let random_number: i32 = rng.random_range(20..=TALKING_RAND_MAX);
                 if random_number <= MEOW_RAND_VALUE {
                     commands.spawn((
                         AudioPlayer::new(asset_server.load("sounds/meow.ogg")),
@@ -105,6 +106,13 @@ fn boss_movement_system(
                         },
                     ));
                 } else if random_number >= EXIT_RAND_VALUE {
+                    commands.spawn((
+                        AudioPlayer::new(asset_server.load("sounds/meow.ogg")),
+                        PlaybackSettings {
+                            volume: Volume::Linear(1.0),
+                            ..Default::default()
+                        },
+                    ));
                     *state = BossState::Exiting;
                 }
             }
@@ -131,6 +139,7 @@ fn boss_cleanup_system(
 ) {
     for (entity, state) in q.iter() {
         if let BossState::Done = state {
+            info!("DESPAWNING");
             commands.entity(entity).despawn();
             evw_loss.write_default();
         }
