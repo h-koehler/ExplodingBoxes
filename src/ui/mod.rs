@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css, prelude::*};
+use bevy::prelude::*;
 
 pub mod button;
 
@@ -12,6 +12,7 @@ pub enum BadAttributes {
 #[derive(Resource)]
 pub struct UIBad {
     pub bad_attributes: Vec<BadAttributes>,
+    pub additional_text: Vec<String>,
 }
 
 fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Res<UIBad>) {

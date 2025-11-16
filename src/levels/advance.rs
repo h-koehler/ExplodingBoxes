@@ -17,8 +17,10 @@ fn advance_level(
     if level.advance() {
         println!("YOU DID IT :DDDDD");
     }
+    
+    println!("{level:?}");
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, advance_level);
+    app.add_systems(PostUpdate, advance_level);
 }
