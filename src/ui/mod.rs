@@ -14,12 +14,12 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 padding: UiRect::all(Val::Px(20.0)),
                 ..Default::default()
             },
-            BackgroundColor(css::WHITE.into()),
+            ImageNode::new(asset_server.load("ui_background.png")),
         ))
         .with_children(|p| {
             p.spawn((
                 Node {
-                    margin: UiRect::vertical(Val::Auto),
+                    margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                     width: Val::Px(128.0),
                     height: Val::Px(128.0),
                     ..Default::default()
@@ -29,12 +29,12 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
 
             p.spawn((
                 Node {
-                    margin: UiRect::vertical(Val::Auto),
+                    margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                     width: Val::Px(128.0),
                     height: Val::Px(128.0),
                     ..Default::default()
                 },
-                ImageNode::new(asset_server.load("red.png")),
+                ImageNode::new(asset_server.load("bad/red_box_v2.png")),
             ));
         });
 }
