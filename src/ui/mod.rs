@@ -1,5 +1,7 @@
 use bevy::{color::palettes::css, prelude::*};
 
+pub mod button;
+
 pub const UI_HEIGHT: f32 = 200.0;
 
 pub enum BadAttributes {
@@ -101,6 +103,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
 }
 
 pub(super) fn register(app: &mut App) {
+    button::register(app);
     app.add_systems(
         Update,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),

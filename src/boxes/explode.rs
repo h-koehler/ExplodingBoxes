@@ -1,9 +1,10 @@
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 
 use rand::Rng;
 
 use crate::{
     boxes::{BadBox, BoxMadeIt, GameBox, GoodBox},
+    custom_utils::GameState,
     room::{ROOM_HEIGHT, ROOM_WIDTH},
 };
 
@@ -27,8 +28,12 @@ fn box_swatted(
             if bad_box {
                 commands.spawn(AudioPlayer::new(asset_server.load("sounds/explosion.ogg")));
             } else if good_box {
-                commands.spawn(AudioPlayer::new(
-                    asset_server.load("sounds/glass_shatter.ogg"),
+                commands.spawn((
+                    AudioPlayer::new(asset_server.load("sounds/glass_shatter.ogg")),
+                    PlaybackSettings {
+                        volume: Volume::Linear(0.5),
+                        ..Default::default()
+                    },
                 ));
             }
             commands.entity(bad_box_entity).despawn();
@@ -40,6 +45,7 @@ fn box_made_it_event(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut evr_box_made_it: MessageReader<BoxMadeIt>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     for box_made_it in evr_box_made_it.read() {
         match box_made_it {
@@ -48,17 +54,26 @@ fn box_made_it_event(
                 let random_number: i32 = rng.random_range(1..=3);
                 let file_name = format!("bad_cat_{}.png", random_number);
                 commands.spawn((
-                    Sprite {
+                    ImageNode {
                         image: asset_server.load(file_name),
-                        custom_size: Some(Vec2::new(ROOM_WIDTH as f32, ROOM_HEIGHT as f32)),
                         ..Default::default()
                     },
-                    Transform::from_xyz(0.0, 0.0, 100.0),
-                    DespawnTimer(Timer::from_seconds(0.8, TimerMode::Once)),
+                    GlobalZIndex(100),
+                    Node {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        ..Default::default()
+                    },
+                    DespawnTimer(Timer::from_seconds(1.0, TimerMode::Once)),
                 ));
-                commands.spawn(AudioPlayer::new(
-                    asset_server.load("sounds/explosion_large.ogg"),
+                commands.spawn((
+                    AudioPlayer::new(asset_server.load("sounds/explosion_large.ogg")),
+                    PlaybackSettings {
+                        volume: Volume::Linear(0.7),
+                        ..Default::default()
+                    },
                 ));
+                next_state.set(GameState::BossCatTime);
             }
             BoxMadeIt::GoodBox => {
                 commands.spawn(AudioPlayer::new(asset_server.load("sounds/beep.ogg")));
