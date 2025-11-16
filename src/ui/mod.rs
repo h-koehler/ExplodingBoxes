@@ -88,6 +88,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
                     }
                     BadAttributes::Color(color) => {
                         p.spawn((
+                            Name::new("Symbol"),
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),

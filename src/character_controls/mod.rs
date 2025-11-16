@@ -6,6 +6,7 @@ use crate::{
 };
 use bevy::prelude::*;
 
+pub mod camera_shake;
 pub mod swat;
 
 const MOVE_SPEED: f32 = 200.0;
@@ -121,6 +122,7 @@ fn load_profiles(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub(super) fn register(app: &mut App) {
     swat::register(app);
+    camera_shake::register(app);
 
     app.add_systems(Startup, (setup, load_profiles));
     app.add_systems(Update, player_input.run_if(in_state(GameState::Running)));
