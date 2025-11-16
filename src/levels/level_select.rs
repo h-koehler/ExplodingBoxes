@@ -1,8 +1,7 @@
 use bevy::{color::palettes::css, prelude::*};
 
 use crate::{
-    levels::{Level, setup_level},
-    ui::button::{ButtonMessage, ButtonStyles, CosmosButton},
+    boxes::GameBox, character_controls::{Character, Velocity, swat::DidBadSwat}, custom_utils::{GameState, PauseMenu}, levels::{Level, advance::JustReset, setup_level}, ui::button::{ButtonMessage, ButtonStyles, CosmosButton}
 };
 
 pub const LEVEL_SELECT: &str = "LEVEL SELECT";
@@ -46,7 +45,7 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
             .with_child((
                 Text::new(LEVEL_SELECT),
                 TextFont {
-                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                    font: asset_server.load("fonts/default.ttf"),
                     font_size: 48.0,
                     ..default()
                 },
@@ -81,7 +80,7 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                             text: Some((
                                 level_num.into(),
                                 TextFont {
-                                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                                    font: asset_server.load("fonts/default.ttf"),
                                     font_size: 48.0,
                                     ..default()
                                 },
@@ -94,24 +93,53 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                             margin: UiRect::all(Val::Px(50.0)),
                             ..Default::default()
                         },
-                        ImageNode::new(asset_server.load("ui_elements/level_select_bg")),
+                        ImageNode::new(asset_server.load("ui_elements/level_num_bg.png")),
                     ))
                     .observe(
-                        move |trigger: On<ButtonMessage>, mut commands: Commands, mut level: ResMut<Level>, q_level_select_menu: Query<Entity, With<LevelSelectMenu>>| {
+                        move |trigger: On<ButtonMessage>, mut commands: Commands, mut level: ResMut<Level>, q_pause: Query<Entity, With<PauseMenu>>, q_level_select_menu: Query<Entity, With<LevelSelectMenu>>| {
                             *level = level_enum;
                             
                             if let Ok(menu_ent) = q_level_select_menu.single() {
                               commands.entity(menu_ent).despawn();
                             } 
 
+                            if let Ok(pause_ent) = q_pause.single() {
+                                commands.entity(pause_ent).despawn();
+                            }
+
                             commands.insert_resource(JustReset)
                         },
-                    );
+                    ).observe(
+                |_: On<ButtonMessage>,
+                 q_boxes: Query<Entity, With<GameBox>>,
+                 mut level: ResMut<Level>,
+                 mut commands: Commands,
+                 q_loss_menu: Query<Entity, With<LevelSelectMenu>>,
+                 q_character: Query<Entity, With<Character>>,
+                 mut state: ResMut<NextState<GameState>>| {
+                    for b in q_boxes.iter() {
+                        commands.entity(b).despawn();
+                    }
+
+                    level.set_changed();
+                    commands
+                        .entity(q_character.single().unwrap())
+                        .insert((
+                            Transform::from_translation(Vec3::Z * 3.0),
+                            Velocity::default(),
+                        ))
+                        .remove::<DidBadSwat>();
+
+                    for e in q_loss_menu.iter() {
+                        commands.entity(e).despawn();
+                    }
+
+                    commands.insert_resource(JustReset);
+
+                    state.set(GameState::Running);
+                },
+            );
                 }
             });
         });
-}
-
-pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, show_select_screen);
 }

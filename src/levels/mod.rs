@@ -420,7 +420,6 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
 
 pub(super) fn register(app: &mut App) {
     advance::register(app);
-    // level_select::register(app);
 
     app.add_systems(Update, setup_level.run_if(resource_changed::<Level>))
         .insert_resource(Level::One);
