@@ -8,7 +8,7 @@ pub struct Movable;
 #[derive(Component)]
 pub struct Conveyor {
     pub direction: Vec2,
-    pub corner_direction: Option<Vec2>,
+    pub after_turn_direction: Option<Vec2>,
 }
 
 #[derive(Component)]
@@ -23,12 +23,13 @@ pub enum ConveyorLayout {
     Line1,
     Line2,
     Spiral,
+    Test,
 }
 
 pub const ROOM_HEIGHT: u32 = 700;
 pub const ROOM_WIDTH: u32 = 1100;
 
-pub const CONVEYOR_LAYOUT: ConveyorLayout = ConveyorLayout::Spiral;
+pub const CONVEYOR_LAYOUT: ConveyorLayout = ConveyorLayout::Test;
 pub const CONVEYOR_SIZE: u32 = 50;
 pub const CONVEYOR_SPEED: f32 = 500.0;
 
@@ -63,6 +64,7 @@ fn create_conveyor_layout(
         ConveyorLayout::Line1 => line_1(9, commands, asset_server),
         ConveyorLayout::Line2 => line_2(commands, asset_server),
         ConveyorLayout::Spiral => spiral(commands, asset_server),
+        ConveyorLayout::Test => test(commands, asset_server),
     }
 }
 
@@ -72,8 +74,15 @@ fn create_conveyor<'a>(
     x: u32,
     y: u32,
     direction: Vec2,
-    corner_direction: Option<Vec2>,
+    after_turn_direction: Option<Vec2>,
 ) -> EntityCommands<'a> {
+    if let Some(dir) = after_turn_direction {
+        println!("{} {} {} {}", x, y, direction, dir);
+    }
+    let rotation_direction = match after_turn_direction {
+        Some(atd) => atd,
+        None => direction,
+    };
     commands.spawn((
         Sprite {
             image: asset_server.load("conveyor_0.png"),
@@ -83,7 +92,7 @@ fn create_conveyor<'a>(
         Transform::default()
             .with_rotation(Quat::from_axis_angle(
                 Vec3::Z,
-                direction.y.atan2(direction.x),
+                rotation_direction.y.atan2(rotation_direction.x),
             ))
             .with_translation(Vec3::new(
                 X_OFFSET + (x * CONVEYOR_SIZE) as f32,
@@ -92,7 +101,7 @@ fn create_conveyor<'a>(
             )),
         Conveyor {
             direction,
-            corner_direction,
+            after_turn_direction,
         },
     ))
 }
@@ -105,15 +114,12 @@ fn create_line_x(
     y: u32,
     direction: Vec2,
     start_dir: Vec2,
-    end_dir: Vec2,
 ) {
     let min_x = start_x.min(end_x);
     let max_x = start_x.max(end_x);
     for x in min_x..=max_x {
         let (dir, after_turn_dir) = if x == start_x && start_dir != direction {
             (start_dir, Some(direction))
-        } else if x == end_x && end_dir != direction {
-            (direction, Some(end_dir))
         } else {
             (direction, None)
         };
@@ -129,15 +135,13 @@ fn create_line_y(
     x: u32,
     direction: Vec2,
     start_dir: Vec2,
-    end_dir: Vec2,
 ) {
     let min_y = start_y.min(end_y);
     let max_y = start_y.max(end_y);
     for y in min_y..=max_y {
         let (dir, after_turn_dir) = if y == start_y && start_dir != direction {
+            println!("{}, {}", start_dir, direction);
             (start_dir, Some(direction))
-        } else if y == end_y && end_dir != direction {
-            (direction, Some(end_dir))
         } else {
             (direction, None)
         };
@@ -186,21 +190,27 @@ fn move_thing_on_conveyor(
         };
 
         if rects_overlap(&this_rect, &rect) {
-            let direction = if let Some(corner_direction) = conv.corner_direction {
+            let direction = if let Some(after_turn_direction) = conv.after_turn_direction {
                 // Corner conveyor. Not for the faint of heart.
                 let positive_direction = conv.direction == Vec2::X || conv.direction == Vec2::Y;
                 let positive_corner_direction =
-                    corner_direction == Vec2::X || corner_direction == Vec2::Y;
+                    after_turn_direction == Vec2::X || after_turn_direction == Vec2::Y;
                 let positive_diagonal = positive_direction && !positive_corner_direction
                     || !positive_direction && positive_corner_direction;
                 let x = trans.translation.x - rect.min.x;
                 let y = trans.translation.y - rect.min.y;
+                println!(
+                    "conveyor translation {} {}",
+                    t.translation.x, t.translation.y
+                );
+                println!("rect.min {} {}", rect.min.x, rect.min.y);
+                println!("x={}, y={}, x < y {}", x, y, x < y);
                 if positive_diagonal && x < y
                     || !positive_diagonal && x + y > (CONVEYOR_SIZE as f32)
                 {
                     conv.direction
                 } else {
-                    corner_direction
+                    after_turn_direction
                 }
             } else {
                 // Straight conveyor.
@@ -258,43 +268,33 @@ fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
         commands,
         asset_server,
         2,
-        ROOM_CONVEYOR_WIDTH - 2,
+        ROOM_CONVEYOR_WIDTH - 3,
         3,
         Vec2::X,
         Vec2::X,
-        Vec2::NEG_Y,
     );
 
-    create_conveyor(
+    create_line_y(
         commands,
         asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
-        4,
-        Vec2::NEG_Y,
-        None,
-    );
-    create_conveyor(
-        commands,
-        asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
+        3,
         5,
+        ROOM_CONVEYOR_WIDTH - 2,
         Vec2::NEG_Y,
-        None,
+        Vec2::X,
     );
 
     create_line_x(
         commands,
         asset_server,
         ROOM_CONVEYOR_WIDTH - 2,
-        1,
+        2,
         6,
         Vec2::NEG_X,
         Vec2::NEG_Y,
-        Vec2::NEG_Y,
     );
 
-    create_conveyor(commands, asset_server, 1, 7, Vec2::NEG_Y, None);
-    create_conveyor(commands, asset_server, 1, 8, Vec2::NEG_Y, None);
+    create_line_y(commands, asset_server, 6, 8, 1, Vec2::NEG_Y, Vec2::NEG_X);
 
     create_line_x(
         commands,
@@ -304,7 +304,6 @@ fn snake_3(commands: &mut Commands, asset_server: &AssetServer) {
         9,
         Vec2::X,
         Vec2::NEG_Y,
-        Vec2::X,
     );
 
     // Last conveyor is the box goal.
@@ -328,70 +327,52 @@ fn snake_4(commands: &mut Commands, asset_server: &AssetServer) {
         commands,
         asset_server,
         2,
-        ROOM_CONVEYOR_WIDTH - 2,
+        ROOM_CONVEYOR_WIDTH - 3,
         3,
         Vec2::X,
         Vec2::X,
-        Vec2::NEG_Y,
     );
 
-    create_conveyor(
+    create_line_y(
         commands,
         asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
-        4,
-        Vec2::NEG_Y,
-        None,
-    );
-    create_conveyor(
-        commands,
-        asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
+        3,
         5,
+        ROOM_CONVEYOR_WIDTH - 2,
         Vec2::NEG_Y,
-        None,
+        Vec2::X,
     );
 
     create_line_x(
         commands,
         asset_server,
         ROOM_CONVEYOR_WIDTH - 2,
-        1,
+        2,
         6,
         Vec2::NEG_X,
         Vec2::NEG_Y,
-        Vec2::NEG_Y,
     );
 
-    create_conveyor(commands, asset_server, 1, 7, Vec2::NEG_Y, None);
-    create_conveyor(commands, asset_server, 1, 8, Vec2::NEG_Y, None);
+    create_line_y(commands, asset_server, 6, 8, 1, Vec2::NEG_Y, Vec2::NEG_X);
 
     create_line_x(
         commands,
         asset_server,
         1,
-        ROOM_CONVEYOR_WIDTH - 2,
+        ROOM_CONVEYOR_WIDTH - 3,
         9,
         Vec2::X,
         Vec2::NEG_Y,
-        Vec2::NEG_Y,
     );
 
-    create_conveyor(
+    create_line_y(
         commands,
         asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
-        10,
-        Vec2::NEG_Y,
-        None,
-    );
-    create_conveyor(
-        commands,
-        asset_server,
-        ROOM_CONVEYOR_WIDTH - 2,
+        9,
         11,
+        ROOM_CONVEYOR_WIDTH - 2,
         Vec2::NEG_Y,
-        None,
+        Vec2::X,
     );
 
     create_line_x(
@@ -402,7 +383,6 @@ fn snake_4(commands: &mut Commands, asset_server: &AssetServer) {
         12,
         Vec2::NEG_X,
         Vec2::NEG_Y,
-        Vec2::NEG_X,
     );
 
     // Last conveyor is the box goal.
@@ -421,7 +401,6 @@ fn line_1(y: u32, commands: &mut Commands, asset_server: &AssetServer) {
         2,
         ROOM_CONVEYOR_WIDTH - 3,
         y,
-        Vec2::X,
         Vec2::X,
         Vec2::X,
     );
@@ -456,19 +435,29 @@ fn spiral(commands: &mut Commands, asset_server: &AssetServer) {
         3,
         Vec2::X,
         Vec2::X,
-        Vec2::X,
     );
 
     create_line_y(
         commands,
         asset_server,
         3,
-        14,
+        13,
         ROOM_CONVEYOR_WIDTH - 2,
         Vec2::NEG_Y,
         Vec2::X,
-        Vec2::NEG_X,
     );
+
+    create_line_x(
+        commands,
+        asset_server,
+        ROOM_CONVEYOR_WIDTH - 2,
+        2,
+        14,
+        Vec2::NEG_X,
+        Vec2::NEG_Y,
+    );
+
+    create_line_y(commands, asset_server, 14, 4, 1, Vec2::Y, Vec2::NEG_X);
 
     // Last conveyor is the box goal.
     // let mut conveyor_commands = create_conveyor(
@@ -480,6 +469,15 @@ fn spiral(commands: &mut Commands, asset_server: &AssetServer) {
     //     None,
     // );
     // conveyor_commands.insert(BoxGoal);
+}
+
+fn test(commands: &mut Commands, asset_server: &AssetServer) {
+    // First conveyor is the box spawner.
+    let mut conveyor_commands = create_conveyor(commands, asset_server, 5, 5, Vec2::NEG_X, None);
+    conveyor_commands.insert(BoxSpawner);
+
+    create_conveyor(commands, asset_server, 4, 5, Vec2::NEG_X, Some(Vec2::Y));
+    create_conveyor(commands, asset_server, 4, 4, Vec2::Y, None);
 }
 
 pub(super) fn register(app: &mut App) {
