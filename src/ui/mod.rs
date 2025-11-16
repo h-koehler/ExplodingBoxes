@@ -1,4 +1,6 @@
-use bevy::{color::palettes::css, prelude::*};
+use std::time::Duration;
+
+use bevy::{color::palettes::css, prelude::*, time::common_conditions::on_timer};
 
 use crate::levels::Level;
 
@@ -26,6 +28,9 @@ pub struct UILevel;
 #[derive(Component)]
 pub struct UIBadItem;
 
+#[derive(Component)]
+struct LeUI;
+
 fn create_ui(
     q_level: Query<Entity, With<UILevel>>,
     q_bad_item: Query<Entity, With<UIBadItem>>,
@@ -33,8 +38,13 @@ fn create_ui(
     asset_server: Res<AssetServer>,
     bad_box: Res<UIBad>,
     level: Res<Level>,
+    q_u: Query<Entity, With<LeUI>>,
 ) {
     if let Ok(level_ent) = q_level.single() {
+        commands.entity(level_ent).despawn();
+    }
+
+    if let Ok(level_ent) = q_u.single() {
         commands.entity(level_ent).despawn();
     }
 
@@ -93,6 +103,7 @@ fn create_ui(
 
     commands
         .spawn((
+            LeUI,
             Node {
                 bottom: Val::Px(0.0),
                 width: Val::Percent(100.0),
