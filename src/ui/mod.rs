@@ -18,12 +18,28 @@ pub struct UIBad {
     pub additional_text: Vec<String>,
 }
 
+#[derive(Component)]
+pub struct UILevel;
+
+#[derive(Component)]
+pub struct UIBadItem;
+
 fn create_ui(
+    q_level: Query<Entity, With<UILevel>>,
+    q_bad_item: Query<Entity, With<UIBadItem>>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     bad_box: Res<UIBad>,
     level: Res<Level>,
 ) {
+    if let Ok(level_ent) = q_level.single() {
+        commands.entity(level_ent).despawn();
+    }
+
+    for bad_item in q_bad_item.iter() {
+        commands.entity(bad_item).despawn();
+    }
+
     let level_num = (*level as i16) + 1;
     commands
         .spawn((Node {
@@ -56,6 +72,7 @@ fn create_ui(
         .with_children(|p| {
             p.spawn((
                 Name::new("Level Number Text"),
+                UILevel,
                 Node {
                     margin: UiRect::horizontal(Val::Px(5.0)),
                     ..Default::default()
@@ -100,6 +117,7 @@ fn create_ui(
                 match bad_item {
                     BadAttributes::Symbol(symbol) => {
                         p.spawn((
+                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),
@@ -111,6 +129,7 @@ fn create_ui(
                     }
                     BadAttributes::Color(color) => {
                         p.spawn((
+                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),

@@ -3,16 +3,6 @@
 version = 4
 
 [[package]]
-name = "ExplodingBoxes"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy-inspector-egui",
- "rand",
- "walkdir",
-]
-
-[[package]]
 name = "ab_glyph"
 version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1821,6 +1811,7 @@ name = "cat_tsa"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy-inspector-egui",
  "rand",
  "walkdir",
 ]

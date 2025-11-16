@@ -11,13 +11,18 @@ pub const ALL_LEVELS: [Level; 5] = [
     Level::Five,
 ];
 
-fn level_select(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub enum LevelSelectState {
+    LevelSelect,
+    NoSelect,
+}
+
+pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             Name::new("Level Select Background"),
             Node {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
+                width: Val::Px(700.0),
+                height: Val::Px(1100.0),
                 position_type: PositionType::Absolute,
                 flex_direction: FlexDirection::Column,
                 padding: UiRect::all(Val::Px(10.0)),
@@ -82,5 +87,5 @@ fn level_select(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, level_select);
+    app.add_systems(Update, show_select_screen);
 }
