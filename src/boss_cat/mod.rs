@@ -3,8 +3,8 @@ use crate::{
 };
 use bevy::prelude::*;
 
-const BOSS_ASS_PATH: &str = "green_box.png";
-const BOSS_SIZE: Vec2 = Vec2::new(50.0, 50.0);
+const BOSS_ASS_PATH: &str = "boss-cat-angy.png";
+const BOSS_SIZE: Vec2 = Vec2::new(200.0, 200.0);
 const BOSS_SPAWN_OFFSET: f32 = 50.0;
 const BOSS_SPEED: f32 = 120.0;
 const TOP_QUARTER_MIN_Y_FACTOR: f32 = 0.25;
