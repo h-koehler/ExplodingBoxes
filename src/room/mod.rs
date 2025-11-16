@@ -1,9 +1,4 @@
-use std::arch::x86_64::_MM_CMPINT_FALSE;
-
-use bevy::{
-    prelude::*,
-    window::{PrimaryWindow, WindowResolution},
-};
+use bevy::prelude::*;
 
 use crate::{custom_utils::GameState, ui::UI_HEIGHT};
 
@@ -124,15 +119,20 @@ fn create_conveyor<'a>(
 ) -> EntityCommands<'a> {
     commands.spawn((
         Sprite {
-            image: asset_server.load("conveyer_piece.png"),
+            image: asset_server.load("conveyor_0.png"),
             custom_size: Some(Vec2::new(CONVEYOR_SIZE as f32, CONVEYOR_SIZE as f32)),
             ..Default::default()
         },
-        Transform::from_translation(Vec3::new(
-            X_OFFSET + (x * CONVEYOR_SIZE) as f32,
-            Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            0.0,
-        )),
+        Transform::default()
+            .with_rotation(Quat::from_axis_angle(
+                Vec3::Z,
+                direction.y.atan2(direction.x),
+            ))
+            .with_translation(Vec3::new(
+                X_OFFSET + (x * CONVEYOR_SIZE) as f32,
+                Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
+                0.0,
+            )),
         Conveyor {
             direction,
             corner_direction,
@@ -250,8 +250,38 @@ fn rects_overlap(a: &Rect, b: &Rect) -> bool {
       a.min.y >= b.max.y) // a is above b
 }
 
-pub(super) fn register(app: &mut App) {
-    app.add_systems(Startup, setup_room);
+#[derive(Resource)]
+struct ConveyorSprites {
+    frames: Vec<Handle<Image>>,
+}
 
-    app.add_systems(Update, move_thing_on_conveyor.run_if(in_state(GameState::Running)));
+const SPEED: f32 = 22.0;
+
+fn animate_conveyors(
+    sprites: Res<ConveyorSprites>,
+    time: Res<Time>,
+    mut q_conveyor: Query<&mut Sprite, With<Conveyor>>,
+) {
+    for mut s in q_conveyor.iter_mut() {
+        s.image =
+            sprites.frames[(time.elapsed_secs() * SPEED) as usize % sprites.frames.len()].clone();
+    }
+}
+
+fn load_sprites(mut commands: Commands, asset_loader: Res<AssetServer>) {
+    commands.insert_resource(ConveyorSprites {
+        frames: vec![
+            asset_loader.load("conveyor_0.png"),
+            asset_loader.load("conveyor_1.png"),
+            asset_loader.load("conveyor_2.png"),
+        ],
+    });
+}
+
+pub(super) fn register(app: &mut App) {
+    app.add_systems(Startup, (setup_room, load_sprites));
+    app.add_systems(
+        Update,
+        (animate_conveyors, move_thing_on_conveyor).run_if(in_state(GameState::Running)),
+    );
 }
