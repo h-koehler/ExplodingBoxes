@@ -1,6 +1,9 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 
-use crate::levels::Level;
+use crate::{
+    levels::{Level, setup_level},
+    ui::button::{ButtonMessage, ButtonStyles, CosmosButton},
+};
 
 pub const LEVEL_SELECT: &str = "LEVEL SELECT";
 pub const ALL_LEVELS: [Level; 5] = [
@@ -11,20 +14,21 @@ pub const ALL_LEVELS: [Level; 5] = [
     Level::Five,
 ];
 
-pub enum LevelSelectState {
-    LevelSelect,
-    NoSelect,
-}
+#[derive(Component)]
+pub struct LevelSelectMenu;
 
 pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             Name::new("Level Select Background"),
+            LevelSelectMenu,
             Node {
-                width: Val::Px(700.0),
-                height: Val::Px(1100.0),
+                width: Val::Px(1100.0),
+                height: Val::Px(700.0),
                 position_type: PositionType::Absolute,
                 flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_items: JustifyItems::Center,
                 padding: UiRect::all(Val::Px(10.0)),
                 ..Default::default()
             },
@@ -34,7 +38,8 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
             p.spawn((
                 Name::new("Level Select Title"),
                 Node {
-                    margin: UiRect::horizontal(Val::Px(5.0)),
+                    margin: UiRect::axes(Val::Px(5.0), Val::Px(50.0)),
+                    height: Val::Px(100.0),
                     ..Default::default()
                 },
             ))
@@ -42,7 +47,7 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                 Text::new(LEVEL_SELECT),
                 TextFont {
                     font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
-                    font_size: 240.0,
+                    font_size: 48.0,
                     ..default()
                 },
                 TextColor(Color::BLACK),
@@ -56,8 +61,8 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                 },
             ))
             .with_children(|p| {
-                for level in ALL_LEVELS.iter() {
-                    let level_num = match level {
+                for level_enum in ALL_LEVELS.iter().copied() {
+                    let level_num = match level_enum {
                         Level::One => "1",
                         Level::Two => "2",
                         Level::Three => "3",
@@ -65,22 +70,43 @@ pub fn show_select_screen(mut commands: Commands, asset_server: Res<AssetServer>
                         Level::Five => "5",
                     };
                     p.spawn((
+                        CosmosButton {
+                            button_styles: Some(ButtonStyles {
+                                background_color: Srgba::rgba_u8(0, 0, 0, 0).into(),
+                                hover_background_color: Srgba::rgba_u8(50, 50, 50, 255).into(),
+                                press_background_color: css::BLACK.into(),
+                                press_foreground_color: css::WHITE.into(),
+                                ..Default::default()
+                            }),
+                            text: Some((
+                                level_num.into(),
+                                TextFont {
+                                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                                    font_size: 48.0,
+                                    ..default()
+                                },
+                                TextColor(Color::BLACK),
+                            )),
+                            ..Default::default()
+                        },
                         Name::new(format!("Level {level_num}")),
                         Node {
-                            margin: UiRect::horizontal(Val::Px(5.0)),
+                            margin: UiRect::all(Val::Px(50.0)),
                             ..Default::default()
                         },
                         ImageNode::new(asset_server.load("ui_elements/level_select_bg")),
                     ))
-                    .with_child((
-                        Text::new(level_num),
-                        TextFont {
-                            font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
-                            font_size: 240.0,
-                            ..Default::default()
+                    .observe(
+                        move |trigger: On<ButtonMessage>, mut commands: Commands, mut level: ResMut<Level>, q_level_select_menu: Query<Entity, With<LevelSelectMenu>>| {
+                            *level = level_enum;
+                            
+                            if let Ok(menu_ent) = q_level_select_menu.single() {
+                              commands.entity(menu_ent).despawn();
+                            } 
+
+                            commands.insert_resource(JustReset)
                         },
-                        TextColor(Color::BLACK),
-                    ));
+                    );
                 }
             });
         });

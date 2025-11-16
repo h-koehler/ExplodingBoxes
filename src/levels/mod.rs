@@ -31,7 +31,7 @@ impl Level {
     }
 }
 
-fn setup_level(mut commands: Commands, level: Res<Level>) {
+fn setup_level(commands: &mut Commands, level: Res<Level>) {
     match *level {
         Level::One => {
             // Bad: Red, Good: Green, Grey (20)
