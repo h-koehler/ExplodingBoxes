@@ -2,7 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     boxes::{BoxKicked, GameBox, GoodBox},
-    character_controls::{Character, Velocity}, custom_utils::GameState,
+    character_controls::{Character, Velocity},
+    custom_utils::GameState,
 };
 
 #[derive(Component)]
@@ -14,7 +15,7 @@ fn on_swat(
     q_player: Query<(Entity, &Transform), With<Character>>,
     mut q_swatted: Query<(&mut Velocity, &Transform, Has<GoodBox>), Added<Swatted>>,
     mut message_writer: MessageWriter<BoxKicked>,
-    mut commands: Commands
+    mut commands: Commands,
 ) {
     for (mut vel, swatted_trans, is_good) in q_swatted.iter_mut() {
         let (player_entity, player_transform) = q_player.single().expect("no player trans");
@@ -22,19 +23,22 @@ fn on_swat(
             .normalize_or(Vec3::Y)
             .xy()
             * SWAT_VEL;
-        message_writer.write(if is_good {BoxKicked::GoodBox} else {
+        message_writer.write(if is_good {
+            BoxKicked::GoodBox
+        } else {
             BoxKicked::BadBox
         });
-        if is_good {
-            commands.entity(player_entity).insert(DidBadSwat);
-        }
     }
 }
 
 fn boss_swat(
-    mut q_player_velocity: Query<&mut Velocity, Added<DidBadSwat>>
+    mut q_player_velocity: Query<&mut Velocity, Added<DidBadSwat>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
-    for (mut vel) in q_player_velocity.iter_mut() {
+    for mut vel in q_player_velocity.iter_mut() {
+        commands.spawn(AudioPlayer::new(asset_server.load("sounds/belt.ogg")));
+
         vel.linear_velocity.x = SWAT_VEL;
         vel.linear_velocity.y = SWAT_VEL;
     }
@@ -90,5 +94,12 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Update, (find_near_box, swat, on_swat, boss_swat).run_if(in_state(GameState::Running)).chain());
+    app.add_systems(
+        Update,
+        (
+            (find_near_box, swat, on_swat).run_if(in_state(GameState::Running)),
+            boss_swat,
+        )
+            .chain(),
+    );
 }

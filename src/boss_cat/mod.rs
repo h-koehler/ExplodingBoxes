@@ -1,5 +1,8 @@
 use crate::{
-    boxes::{BoxKicked, BoxMadeIt}, custom_utils::GameState, room::{Movable, ROOM_HEIGHT}
+    boxes::{BoxKicked, BoxMadeIt},
+    character_controls::{Character, Velocity, swat::DidBadSwat},
+    custom_utils::GameState,
+    room::{Movable, ROOM_HEIGHT},
 };
 use bevy::prelude::*;
 
@@ -45,6 +48,8 @@ fn boss_spawning_system(
 fn boss_movement_system(
     time: Res<Time>,
     mut q: Query<(&mut Transform, &mut BossState), With<BossCat>>,
+    q_player: Query<Entity, With<Character>>,
+    mut commands: Commands,
 ) {
     let dt = time.delta_secs();
     for (mut transform, mut state) in q.iter_mut() {
@@ -67,6 +72,9 @@ fn boss_movement_system(
                 *state = BossState::Exiting;
             }
             BossState::Exiting => {
+                if let Ok(player_ent) = q_player.single() {
+                    commands.entity(player_ent).insert(DidBadSwat);
+                }
                 // boss walks off the screen
                 transform.translation.y += BOSS_SPEED * dt;
                 let half_h = ROOM_HEIGHT as f32 / 2.0;
@@ -93,6 +101,7 @@ fn boss_delay_spawn_system(
     mut commands: Commands,
     delay: Option<ResMut<Delay>>,
     mut next_state: ResMut<NextState<GameState>>,
+    q_player: Query<Entity, With<Character>>,
 ) {
     let Some(mut delay) = delay else { return };
 
@@ -120,6 +129,10 @@ fn boss_delay_spawn_system(
             },
             Transform::from_translation(Vec3::new(0.0, spawn_y, 5.0)),
         ));
+
+        commands
+            .entity(q_player.single().unwrap())
+            .insert(Velocity::default());
     }
 }
 

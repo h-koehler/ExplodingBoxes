@@ -35,7 +35,7 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
         Level::One => {
             commands.insert_resource(SpawnList {
                 entries: vec![
-                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
                     SpawnItem::Good(vec![(
                         "simple",
                         css::GREEN,
@@ -49,7 +49,7 @@ fn setup_level(mut commands: Commands, level: Res<Level>) {
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
-                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
                 ],
             });
             commands.insert_resource(UIBad {
