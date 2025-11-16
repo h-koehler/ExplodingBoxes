@@ -165,7 +165,7 @@ fn create_ui(
                         Name::new("TEXT!"),
                         Text::new("NEW INSTRUCTIONS"),
                         TextFont {
-                            font_size: 24.0,
+                            font_size: 40.0,
                             font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },
@@ -181,8 +181,8 @@ fn create_ui(
                         Name::new("TEXT!"),
                         Text::new(text),
                         TextFont {
-                            font_size: 24.0,
-                            // font: asset_server.load("fonts/default.TTF"),
+                            font_size: 33.0,
+                            font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },
                         Node {
