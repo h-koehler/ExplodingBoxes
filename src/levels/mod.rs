@@ -344,17 +344,17 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
             // Introoduce plus sign - copies BEHAVIOR of previous box
             commands.insert_resource(SpawnList {
                 entries: vec![
-                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 1
-                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 4 - BAD
-                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 3
-                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 2
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 2
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 1
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 4
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 3
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY BAD
                     SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
-                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 1
-                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 4
-                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY GOOD
-                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]),
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 2
+                    SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 1
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY BAD
+                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COOPY BAD
                     SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("circle".into()))]), // COPY BAD
                     SpawnItem::Bad(vec![(
                         "simple",
@@ -362,14 +362,14 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                         BoxAddOns::new("triangle".into()),
                     )]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
-                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("plus".into()))]), // 3
-                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::new("square".into()))]), // 2
+                    SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("plus".into()))]), // COPY SQUARE 4 -> BAD
+                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::new("square".into()))]), // 3
                     SpawnItem::Good(vec![(
                         "simple",
                         css::GREEN,
                         BoxAddOns::new("square".into()),
-                    )]), // 1
-                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]),
+                    )]), // 2
+                    SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 1
                     SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::default())]), 
                     SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 4 -> BAD
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 3
@@ -382,11 +382,7 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     )]), // 1
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY GOOD
                     SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::default())]),
-                    SpawnItem::Bad(vec![(
-                        "simple",
-                        css::GREEN,
-                        BoxAddOns::new("triangle".into()),
-                    )]),
+                    SpawnItem::Bad(vec![("simple",css::GREEN,BoxAddOns::new("triangle".into()))]),
                     SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("circle".into()))]), // COPY BAD
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::default())]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
