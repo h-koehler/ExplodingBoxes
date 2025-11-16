@@ -11,10 +11,19 @@ pub struct Swatted;
 
 const SWAT_VEL: f32 = 1000.0;
 
+#[derive(Resource)]
+struct Swat(Handle<AudioSource>);
+
+fn load_swat_sound(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(Swat(asset_server.load("sounds/swat.ogg")));
+}
+
 fn on_swat(
     q_player: Query<&Transform, With<Character>>,
     mut q_swatted: Query<(&mut Velocity, &Transform, Has<GoodBox>), Added<Swatted>>,
     mut message_writer: MessageWriter<BoxKicked>,
+    mut commands: Commands,
+    swat: Res<Swat>,
 ) {
     for (mut vel, swatted_trans, is_good) in q_swatted.iter_mut() {
         let player_transform = q_player.single().expect("no player trans");
@@ -22,6 +31,14 @@ fn on_swat(
             .normalize_or(Vec3::Y)
             .xy()
             * SWAT_VEL;
+
+        commands.spawn((
+            AudioPlayer::new(swat.0.clone()),
+            PlaybackSettings {
+                volume: bevy::audio::Volume::Linear(0.5),
+                ..Default::default()
+            },
+        ));
         message_writer.write(if is_good {
             BoxKicked::GoodBox
         } else {
@@ -100,7 +117,7 @@ fn swat(
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Startup, load_belt_sound);
+    app.add_systems(Startup, (load_swat_sound, load_belt_sound));
 
     app.add_systems(
         Update,
