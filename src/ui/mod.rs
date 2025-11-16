@@ -24,7 +24,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
                 padding: UiRect::all(Val::Px(20.0)),
                 ..Default::default()
             },
-            ImageNode::new(asset_server.load("ui_background.png")),
+            ImageNode::new(asset_server.load("ui_elements/ui_background.png")),
         ))
         .with_children(|p| {
             p.spawn((
@@ -34,7 +34,7 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Re
                     height: Val::Px(128.0),
                     ..Default::default()
                 },
-                ImageNode::new(asset_server.load("X.png")),
+                ImageNode::new(asset_server.load("ui_elements/X.png")),
             ));
 
             for bad_item in bad_box.bad_attributes.iter() {
