@@ -77,12 +77,6 @@ pub enum BoxMadeIt {
     BadBox,
 }
 
-#[derive(Message)]
-pub enum BoxKicked {
-    GoodBox,
-    BadBox,
-}
-
 fn kill_box(
     mut commands: Commands,
     q_box: Query<(Entity, &Transform, Has<GoodBox>), (With<GameBox>, Without<Swatted>)>,
@@ -122,6 +116,5 @@ pub(super) fn register(app: &mut App) {
             kill_box.run_if(in_state(GameState::Running)),
         ),
     )
-    .add_message::<BoxMadeIt>()
-    .add_message::<BoxKicked>();
+    .add_message::<BoxMadeIt>();
 }
