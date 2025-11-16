@@ -146,19 +146,15 @@ fn create_ui(
                 }
             }
 
-            p.spawn(
-                (Node {
-                    flex_grow: 1.0,
-                    ..Default::default()
-                }),
-            );
+            p.spawn(Node {
+                flex_grow: 1.0,
+                ..Default::default()
+            });
 
-            p.spawn(
-                (Node {
-                    flex_direction: FlexDirection::Column,
-                    ..Default::default()
-                }),
-            )
+            p.spawn(Node {
+                flex_direction: FlexDirection::Column,
+                ..Default::default()
+            })
             .with_children(|p| {
                 if !bad_box.additional_text.is_empty() {
                     p.spawn((
