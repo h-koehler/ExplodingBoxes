@@ -5,7 +5,7 @@ use bevy::{
     window::{PrimaryWindow, WindowResolution},
 };
 
-use crate::ui::UI_HEIGHT;
+use crate::{custom_utils::GameState, ui::UI_HEIGHT};
 
 #[derive(Component)]
 pub struct Movable;
@@ -253,5 +253,5 @@ fn rects_overlap(a: &Rect, b: &Rect) -> bool {
 pub(super) fn register(app: &mut App) {
     app.add_systems(Startup, setup_room);
 
-    app.add_systems(Update, move_thing_on_conveyor);
+    app.add_systems(Update, move_thing_on_conveyor.run_if(in_state(GameState::Running)));
 }

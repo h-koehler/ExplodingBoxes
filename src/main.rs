@@ -7,6 +7,7 @@ pub mod character_controls;
 pub mod levels;
 pub mod room;
 pub mod ui;
+pub mod custom_utils;
 
 fn main() {
     let mut app = App::new();
@@ -27,6 +28,7 @@ fn main() {
     boxes::register(&mut app);
     room::register(&mut app);
     ui::register(&mut app);
+    custom_utils::register(&mut app);
     levels::register(&mut app);
 
     app.run();
