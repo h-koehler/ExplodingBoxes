@@ -1,6 +1,12 @@
 use bevy::{color::palettes::css, prelude::*};
 
-use crate::{custom_utils::GameState, ui::button::CosmosButton};
+use crate::{
+    boxes::GameBox,
+    character_controls::{Character, Velocity, swat::DidBadSwat},
+    custom_utils::GameState,
+    levels::Level,
+    ui::button::{ButtonMessage, CosmosButton},
+};
 
 #[derive(Message, Default)]
 pub struct LossScreen;
@@ -10,6 +16,9 @@ pub enum LossReason {
     BadKick,
     BadLetThrough,
 }
+
+#[derive(Component)]
+struct LossMenu;
 
 fn show_loss(
     mut mr_loss: MessageReader<LossScreen>,
@@ -28,6 +37,7 @@ fn show_loss(
 
     commands
         .spawn((
+            LossMenu,
             Name::new("Loss menu"),
             Node {
                 margin: UiRect::all(Val::Auto),
@@ -95,7 +105,35 @@ fn show_loss(
                     margin: UiRect::all(Val::Px(50.0)),
                     ..Default::default()
                 },
-            ));
+            ))
+            .observe(
+                |_: On<ButtonMessage>,
+                 q_boxes: Query<Entity, With<GameBox>>,
+                 mut level: ResMut<Level>,
+                 mut commands: Commands,
+                 q_loss_menu: Query<Entity, With<LossMenu>>,
+                 q_character: Query<Entity, With<Character>>,
+                 mut state: ResMut<NextState<GameState>>| {
+                    for b in q_boxes.iter() {
+                        commands.entity(b).despawn();
+                    }
+
+                    *level = Level::One;
+                    commands
+                        .entity(q_character.single().unwrap())
+                        .insert((
+                            Transform::from_translation(Vec3::Z * 3.0),
+                            Velocity::default(),
+                        ))
+                        .remove::<DidBadSwat>();
+
+                    for e in q_loss_menu.iter() {
+                        commands.entity(e).despawn();
+                    }
+
+                    state.set(GameState::Running);
+                },
+            );
         });
 }
 

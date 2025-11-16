@@ -38,7 +38,7 @@ fn boss_spawning_system(
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
             commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
-            commands.insert_resource(LossReason::BadKick);
+            commands.insert_resource(LossReason::BadLetThrough);
         }
     }
 

@@ -50,6 +50,7 @@ fn box_swatted(
                     },
                 ));
                 commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+                commands.insert_resource(LossReason::BadKick);
                 next_state.set(GameState::BossCatTime);
                 commands
                     .entity(q_player.single().expect("no player ;("))
