@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css, log::tracing_subscriber::fmt::writer::WithMinLevel, prelude::*};
+use bevy::prelude::*;
 
 use crate::levels::Level;
 
@@ -14,12 +14,28 @@ pub struct UIBad {
     pub bad_attributes: Vec<BadAttributes>,
 }
 
+#[derive(Component)]
+pub struct UILevel;
+
+#[derive(Component)]
+pub struct UIBadItem;
+
 fn create_ui(
     mut commands: Commands,
+    q_level: Query<Entity, With<UILevel>>,
+    q_bad_item: Query<Entity, With<UIBadItem>>,
     asset_server: Res<AssetServer>,
     bad_box_rules: Res<UIBad>,
     level: Res<Level>,
 ) {
+    if let Ok(level_ent) = q_level.single() {
+        commands.entity(level_ent).despawn();
+    }
+
+    for bad_item in q_bad_item.iter() {
+        commands.entity(bad_item).despawn();
+    }
+
     commands
         .spawn((Node {
             top: Val::Px(0.0),
@@ -43,6 +59,7 @@ fn create_ui(
 
             let level_num = (*level as i16) + 1;
             p.spawn((
+                UILevel,
                 Node {
                     margin: UiRect::horizontal(Val::Px(5.0)),
                     width: Val::Px(20.0),
@@ -81,6 +98,7 @@ fn create_ui(
                 match bad_item {
                     BadAttributes::Symbol(symbol) => {
                         p.spawn((
+                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),
@@ -92,6 +110,7 @@ fn create_ui(
                     }
                     BadAttributes::Color(color) => {
                         p.spawn((
+                            UIBadItem,
                             Node {
                                 margin: UiRect::axes(Val::Px(5.0), Val::Auto),
                                 width: Val::Px(128.0),
