@@ -126,7 +126,7 @@ fn create_conveyor_start(
         Transform::default().with_translation(Vec3::new(
             X_OFFSET + (x * CONVEYOR_SIZE) as f32,
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            1.0,
+            2.9,
         )),
     ));
     let mut conveyor_entity = create_conveyor(
@@ -160,7 +160,7 @@ fn create_conveyor_end(
         Transform::default().with_translation(Vec3::new(
             X_OFFSET + (x * CONVEYOR_SIZE) as f32,
             Y_OFFSET - (y * CONVEYOR_SIZE) as f32,
-            1.0,
+            2.9,
         )),
     ));
     let mut conveyor_entity = create_conveyor(
