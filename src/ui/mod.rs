@@ -3,6 +3,7 @@ use bevy::{color::palettes::css, prelude::*};
 use crate::levels::Level;
 
 pub mod button;
+pub mod loss;
 
 pub const UI_HEIGHT: f32 = 200.0;
 pub const LEVEL: &str = "LEVEL";
@@ -45,7 +46,7 @@ fn create_ui(
             .with_child((
                 Text::new(LEVEL),
                 TextFont {
-                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                    font: asset_server.load("fonts/default.ttf"),
                     font_size: 33.0,
                     ..default()
                 },
@@ -62,7 +63,7 @@ fn create_ui(
             .with_child((
                 Text::new(level_num.to_string()),
                 TextFont {
-                    font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                    font: asset_server.load("fonts/default.ttf"),
                     font_size: 33.0,
                     ..default()
                 },
@@ -143,7 +144,7 @@ fn create_ui(
                         Text::new("NEW INSTRUCTIONS"),
                         TextFont {
                             font_size: 24.0,
-                            font: asset_server.load("fonts/ARCADECLASSIC.ttf"),
+                            font: asset_server.load("fonts/default.ttf"),
                             ..Default::default()
                         },
                         TextColor(css::RED.into()),
@@ -159,7 +160,7 @@ fn create_ui(
                         Text::new(text),
                         TextFont {
                             font_size: 24.0,
-                            // font: asset_server.load("fonts/ARCADECLASSIC.TTF"),
+                            // font: asset_server.load("fonts/default.TTF"),
                             ..Default::default()
                         },
                         Node {
@@ -174,6 +175,7 @@ fn create_ui(
 
 pub(super) fn register(app: &mut App) {
     button::register(app);
+    loss::register(app);
     app.add_systems(
         Update,
         create_ui.run_if(resource_exists_and_changed::<UIBad>),

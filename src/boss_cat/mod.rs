@@ -3,6 +3,7 @@ use crate::{
     character_controls::{Character, Velocity, swat::DidBadSwat},
     custom_utils::GameState,
     room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
+    ui::loss::{LossReason, LossScreen},
 };
 use bevy::prelude::*;
 
@@ -43,6 +44,7 @@ fn boss_spawning_system(
     for msg in kicked_message_reader.read() {
         if let BoxKicked::GoodBox = msg {
             commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
+            commands.insert_resource(LossReason::BadKick);
             next_state.set(GameState::BossCatTime);
             commands
                 .entity(q_player.single().expect("no player ;("))
@@ -108,10 +110,15 @@ fn boss_movement_system(
     }
 }
 
-fn boss_cleanup_system(mut commands: Commands, q: Query<(Entity, &BossState), With<BossCat>>) {
+fn boss_cleanup_system(
+    mut commands: Commands,
+    q: Query<(Entity, &BossState), With<BossCat>>,
+    mut evw_loss: MessageWriter<LossScreen>,
+) {
     for (entity, state) in q.iter() {
         if let BossState::Done = state {
             commands.entity(entity).despawn();
+            evw_loss.write_default();
         }
     }
 }

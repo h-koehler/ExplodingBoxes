@@ -9,6 +9,7 @@ use crate::{
     character_controls::camera_shake::CameraShake,
     custom_utils::GameState,
     room::{ROOM_HEIGHT, ROOM_WIDTH},
+    ui::loss::LossReason,
 };
 
 #[derive(Component)]
@@ -75,6 +76,7 @@ fn box_made_it_event(
                     },
                     DespawnTimer(Timer::from_seconds(1.0, TimerMode::Once)),
                 ));
+                commands.insert_resource(LossReason::BadLetThrough);
                 commands.spawn((
                     AudioPlayer::new(asset_server.load("sounds/explosion_large.ogg")),
                     PlaybackSettings {
