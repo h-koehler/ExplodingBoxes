@@ -20,53 +20,26 @@ enum BossState {
     Done,
 }
 
+#[derive(Resource)]
+struct Delay(Timer);
+
 // Boss cat boutta pull up
 fn boss_spawning_system(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut madeit_message_reader: MessageReader<BoxMadeIt>,
     mut kicked_message_reader: MessageReader<BoxKicked>,
-    mut next_state: ResMut<NextState<GameState>>,
 ) {
-    let half_h = ROOM_HEIGHT as f32 / 2.0;
-    let spawn_y = half_h + BOSS_SPAWN_OFFSET;
-
-    let top_quarter_min = ROOM_HEIGHT as f32 * TOP_QUARTER_MIN_Y_FACTOR;
-    let target_y = (top_quarter_min + half_h) * 0.5;
-
     for msg in madeit_message_reader.read() {
         if let BoxMadeIt::BadBox = msg {
-            next_state.set(GameState::BossCatTime);
-            spawn_boss(&mut commands, &asset_server, spawn_y, target_y);
+            commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
         }
     }
 
     for msg in kicked_message_reader.read() {
         if let BoxKicked::GoodBox = msg {
-            next_state.set(GameState::BossCatTime);
-            spawn_boss(&mut commands, &asset_server, spawn_y, target_y);
+            commands.insert_resource(Delay(Timer::from_seconds(1.0, TimerMode::Once)));
         }
     }
-}
-
-fn spawn_boss(
-    commands: &mut Commands<'_, '_>,
-    asset_server: &Res<'_, AssetServer>,
-    spawn_y: f32,
-    target_y: f32,
-) {
-    // spawn Boss Cat
-    commands.spawn((
-        BossCat,
-        Movable,
-        BossState::Entering { target_y },
-        Sprite {
-            image: asset_server.load(BOSS_ASS_PATH),
-            custom_size: Some(BOSS_SIZE),
-            ..Default::default()
-        },
-        Transform::from_translation(Vec3::new(0.0, spawn_y, 5.0)),
-    ));
 }
 
 fn boss_movement_system(
@@ -114,8 +87,45 @@ fn boss_cleanup_system(mut commands: Commands, q: Query<(Entity, &BossState), Wi
     }
 }
 
+fn boss_delay_spawn_system(
+    time: Res<Time>,
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
+    delay: Option<ResMut<Delay>>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    let Some(mut delay) = delay else { return };
+
+    delay.0.tick(time.delta());
+
+    if delay.0.is_finished() {
+        commands.remove_resource::<Delay>();
+        next_state.set(GameState::BossCatTime);
+
+        // --- spawn boss here ---
+        let half_h = ROOM_HEIGHT as f32 / 2.0;
+        let spawn_y = half_h + BOSS_SPAWN_OFFSET;
+
+        let top_quarter_min = ROOM_HEIGHT as f32 * TOP_QUARTER_MIN_Y_FACTOR;
+        let target_y = (top_quarter_min + half_h) * 0.5;
+
+        commands.spawn((
+            BossCat,
+            Movable,
+            BossState::Entering { target_y },
+            Sprite {
+                image: asset_server.load(BOSS_ASS_PATH),
+                custom_size: Some(BOSS_SIZE),
+                ..Default::default()
+            },
+            Transform::from_translation(Vec3::new(0.0, spawn_y, 5.0)),
+        ));
+    }
+}
+
 pub(super) fn register(app: &mut App) {
     app.add_systems(PostUpdate, boss_spawning_system);
+    app.add_systems(Update, boss_delay_spawn_system.before(boss_movement_system));
     app.add_systems(Update, boss_movement_system);
     app.add_systems(PostUpdate, boss_cleanup_system);
 }
