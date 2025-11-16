@@ -1,5 +1,8 @@
 use crate::{
-    character_controls::swat::DidBadSwat, custom_utils::GameState, room::{Movable, ROOM_HEIGHT, ROOM_WIDTH}, ui::UI_HEIGHT
+    character_controls::swat::DidBadSwat,
+    custom_utils::GameState,
+    room::{Movable, ROOM_HEIGHT, ROOM_WIDTH},
+    ui::UI_HEIGHT,
 };
 use bevy::prelude::*;
 
@@ -24,7 +27,9 @@ fn player_input(
     mut q_player: Query<(&mut Velocity, &mut Sprite), (With<Character>, Without<DidBadSwat>)>,
     profiles: Res<PlayerProfiles>,
 ) {
-    let Ok ((mut char_vel, mut sprite)) = q_player.single_mut() else { return; };
+    let Ok((mut char_vel, mut sprite)) = q_player.single_mut() else {
+        return;
+    };
     let mut dir = Vec2::ZERO;
 
     if inputs.pressed(KeyCode::KeyA) {
@@ -119,5 +124,5 @@ pub(super) fn register(app: &mut App) {
 
     app.add_systems(Startup, (setup, load_profiles));
     app.add_systems(Update, player_input.run_if(in_state(GameState::Running)));
-    app.add_systems(PostUpdate, apply_velocity.run_if(in_state(GameState::Running)));
+    app.add_systems(PostUpdate, apply_velocity);
 }
