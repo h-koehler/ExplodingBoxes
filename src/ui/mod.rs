@@ -2,7 +2,17 @@ use bevy::{color::palettes::css, prelude::*};
 
 pub const UI_HEIGHT: f32 = 200.0;
 
-fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub enum BadAttributes {
+    Color(Srgba),
+    Symbol(String),
+}
+
+#[derive(Resource)]
+pub struct UIBad {
+    pub bad_attributes: Vec<BadAttributes>,
+}
+
+fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>, bad_box: Res<UIBad>) {
     commands
         .spawn((
             Node {
@@ -27,18 +37,39 @@ fn create_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ImageNode::new(asset_server.load("X.png")),
             ));
 
-            p.spawn((
-                Node {
-                    margin: UiRect::axes(Val::Px(5.0), Val::Auto),
-                    width: Val::Px(128.0),
-                    height: Val::Px(128.0),
-                    ..Default::default()
-                },
-                ImageNode::new(asset_server.load("bad/red_box_v2.png")),
-            ));
+            for bad_item in bad_box.bad_attributes.iter() {
+                match bad_item {
+                    BadAttributes::Symbol(symbol) => {
+                        p.spawn((
+                            Node {
+                                margin: UiRect::axes(Val::Px(5.0), Val::Auto),
+                                width: Val::Px(128.0),
+                                height: Val::Px(128.0),
+                                ..Default::default()
+                            },
+                            ImageNode::new(asset_server.load(format!("bad/{symbol}.png"))),
+                        ));
+                    }
+                    BadAttributes::Color(color) => {
+                        p.spawn((
+                            Node {
+                                margin: UiRect::axes(Val::Px(5.0), Val::Auto),
+                                width: Val::Px(128.0),
+                                height: Val::Px(128.0),
+                                ..Default::default()
+                            },
+                            ImageNode::new(asset_server.load(format!("neutral/simple.png")))
+                                .with_color((*color).into()),
+                        ));
+                    }
+                }
+            }
         });
 }
 
 pub(super) fn register(app: &mut App) {
-    app.add_systems(Startup, create_ui);
+    app.add_systems(
+        Update,
+        create_ui.run_if(resource_exists_and_changed::<UIBad>),
+    );
 }
