@@ -61,7 +61,10 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
             });
             commands.insert_resource(UIBad {
                 bad_attributes: vec![BadAttributes::Color(css::RED)],
-                additional_text: vec![],
+                additional_text: vec![
+                    "Press SPACE to swat all explosive boxes!".into(),
+                    "See Left Guide for Explosive Box Types".into(),
+                ],
             });
         }
         Level::Two => {
@@ -349,10 +352,18 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 3
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 2
                     SpawnItem::Bad(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY BAD
-                    SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![(
+                        "simple",
+                        css::GREY,
+                        BoxAddOns::new("triangle".into()),
+                    )]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::default())]),
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 1
-                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("square".into()))]), // 4
+                    SpawnItem::Bad(vec![(
+                        "simple",
+                        css::GREEN,
+                        BoxAddOns::new("square".into()),
+                    )]), // 4
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("circle".into()))]), // COPY GOOD
                     SpawnItem::Good(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]),
                     SpawnItem::Bad(vec![("simple", css::GREY, BoxAddOns::new("circle".into()))]), // COPY BAD
@@ -370,10 +381,14 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                         BoxAddOns::new("square".into()),
                     )]), // 1
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]),
-                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::default())]), 
+                    SpawnItem::Good(vec![("simple", css::GREY, BoxAddOns::default())]),
                     SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("plus".into()))]), // COPY SQUARE - 4 -> BAD
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("square".into()))]), // 3
-                    SpawnItem::Bad(vec![("simple", css::GREEN, BoxAddOns::new("triangle".into()))]),
+                    SpawnItem::Bad(vec![(
+                        "simple",
+                        css::GREEN,
+                        BoxAddOns::new("triangle".into()),
+                    )]),
                     SpawnItem::Good(vec![("simple", css::RED, BoxAddOns::new("plus".into()))]), // COPY SQARE - 2
                     SpawnItem::Good(vec![(
                         "simple",
@@ -397,7 +412,9 @@ pub fn setup_level(mut commands: Commands, level: Res<Level>) {
                     BadAttributes::Color(css::RED),
                     BadAttributes::Symbol("triangle".into()),
                 ],
-                additional_text: vec!["Plus signs are copycats! Pay attention to their leader.".into()],
+                additional_text: vec![
+                    "Plus signs are copycats! Pay attention to their leader.".into(),
+                ],
             });
         }
     }
